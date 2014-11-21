@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+require 'spf_parse'
+require 'resolv'
+
+unless ARGV[0]
+  puts "Please supply at least one host name"
+  exit
+end
+
+resolver = Resolv::DNS.new
+ARGV.each do |arg|
+
+  puts "____________________________\n"
+  puts "SPF record search for #{arg}"
+  begin
+    spf = SpfParse.check_host(arg, resolver)
+  rescue
+    puts "  -error: could not process input :#{arg}"
+    puts "____________________________\n\n"
+    next
+  end
+  
+  if spf
+    puts "  - found SPF record for #{arg} at #{spf[:record_path]}:\n  #{spf[:record]}"
+  else
+    puts "  - no SPF record found for #{arg}"
+  end
+  puts "____________________________\n\n"
+end
