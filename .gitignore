@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 /.bundle/
 /.yardoc
 /Gemfile.lock
@@ -14,6 +15,8 @@
 *.a
 mkmf.log
 =======
+=======
+>>>>>>> fed1141939dbe709d44dedb0247d31908300c31f
 *.gem
 *.rbc
 /.config
@@ -48,4 +51,7 @@ build/
 
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
+<<<<<<< HEAD
 >>>>>>> 62c17ee30b1a7d25ef12fab39fd6c2de0bcbadbc
+=======
+>>>>>>> fed1141939dbe709d44dedb0247d31908300c31f
