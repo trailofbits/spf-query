@@ -10,5 +10,6 @@ group :development do
 end
 
 group :test do
+  gem 'json'
   gem 'codeclimate-test-reporter', require: nil
 end
