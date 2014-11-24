@@ -4,7 +4,7 @@ CodeClimate::TestReporter.start
 require 'rspec'
 require 'spf_parse'
 
-include SpfParse
+include SPFParse
 
 RSpec.configure do |specs|
   specs

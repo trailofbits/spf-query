@@ -1,7 +1,7 @@
 require "spf_parse/version"
 require 'resolv'
 
-module SpfParse
+module SPFParse
   def self.check_host(host, resolver=Resolv::DNS.new)
     begin
       host_without_tld = host[0...host.rindex('.')]

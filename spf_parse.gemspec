@@ -5,7 +5,7 @@ require 'spf_parse/version'
 
 Gem::Specification.new do |gem|
   gem.name          = "spf_parse"
-  gem.version       = SpfParse::VERSION
+  gem.version       = SPFParse::VERSION
   gem.authors       = ["nicktitle"]
   gem.email         = ["nick.esposito@trailofbits.com"]
   gem.summary       = %q{SPF Retriever and Parser}

@@ -14,7 +14,7 @@ ARGV.each do |arg|
   puts "____________________________\n"
   puts "SPF record search for #{arg}"
   begin
-    spf = SpfParse.check_host(arg, resolver)
+    spf = SPFParse.check_host(arg, resolver)
   rescue
     puts "  -error: could not process input :#{arg}"
     puts "____________________________\n\n"
