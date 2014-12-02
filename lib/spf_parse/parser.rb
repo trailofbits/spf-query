@@ -104,18 +104,9 @@ module SPFParse
     rule(:explanation) do
       str('exp').as(:name) >> str('=') >> domain_spec.as(:value)
     end
-    rule(:unknown_modifier) { name >> equals >> macro_string }
+    rule(:unknown_modifier) { name >> equals >> macro_string? }
 
-    rule(:domain_spec) { macro_string >> domain_end }
-    rule(:domain_end) do
-      (str('.') >> toplabel >> str('.').maybe) |
-      macro_expand
-    end
-    rule(:toplabel) do
-      (alphanum.repeat(0) >> alpha >> alphanum.repeat(0)) |
-      (alphanum.repeat(1) >> str('-') >> (alphanum | str('-')).repeat(0) >> alphanum)
-    end
-
+    rule(:domain_spec) { macro_string.as(:domain) }
     rule(:name) { alpha >> (alpha | digit | match['-_\.'] ).repeat(0) }
 
     #
@@ -124,8 +115,9 @@ module SPFParse
     # See RFC 4408, Section 8.1.
     #
     rule(:macro_string) do
-      (macro_expand | macro_literal.repeat(1).as(:text)).repeat(0)
+      (macro_expand | macro_literal.repeat(1).as(:text)).repeat(1)
     end
+    rule(:macro_string?) { macro_string.maybe }
     rule(:macro_expand) do
       (
         (
