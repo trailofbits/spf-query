@@ -18,8 +18,8 @@ module SPFParse
         a       |
         mx      |
         ptr     |
-        ipv4    |
-        ipv6    |
+        ip4     |
+        ip6     |
         exists
       ).as(:mechanism)
     end
@@ -52,7 +52,10 @@ module SPFParse
     #
     rule(:mx) do
       str('mx').as(:name) >>
-      ((str(':') >> domain_spec).maybe >> dual_cidr_length.maybe).as(:value)
+      (
+        (str(':') >> domain_spec).maybe >>
+         dual_cidr_length.as(:cidr_length).maybe
+      ).as(:value)
     end
 
     #
@@ -97,7 +100,9 @@ module SPFParse
       str('exists').as(:name) >> str(':') >> domain_spec.as(:value)
     end
 
-    rule(:modifier) { redirect | explanation | unknown_modifier }
+    rule(:modifier) do
+      (redirect | explanation | unknown_modifier).as(:modifier)
+    end
     rule(:redirect) do
       str('redirect').as(:name) >> str('=') >> domain_spec.as(:value)
     end
