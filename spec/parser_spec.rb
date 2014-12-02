@@ -3,11 +3,97 @@ require 'spf_parse/parser'
 
 describe Parser do
   describe "rules" do
+    describe "record" do
+      subject { super().record }
+
+      it "should parse a version then multiple terms" do
+        expect(subject.parse("v=spf1 -all redirect=_spf.example.com")).to be == [
+          {version: 'spf1'},
+
+          {
+            qualifier: '-',
+            mechanism: {name: "all"}
+          },
+
+          {
+            modifier: {
+              name: 'redirect',
+              value: {domain: [{literal: '_spf.example.com'}]}
+            }
+          }
+        ]
+      end
+    end
+
     describe "version" do
       subject { super().version }
 
       it "should match v=spf1" do
         expect(subject.parse('v=spf1')).to be == {version: 'spf1'}
+      end
+    end
+
+    describe "terms" do
+      subject { super().terms }
+
+      it "should parse a single term" do
+        expect(subject.parse("-all")).to be == {
+          qualifier: '-',
+          mechanism: {name: "all"}
+        }
+      end
+
+      it "should parse multiple terms separated by one or more spaces" do
+        expect(subject.parse("-all  redirect=_spf.example.com")).to be == [
+          {
+            qualifier: '-',
+            mechanism: {name: "all"}
+          },
+
+          {
+            modifier: {
+              name: 'redirect',
+              value: {domain: [{literal: '_spf.example.com'}]}
+            }
+          }
+        ]
+      end
+    end
+
+    describe "term" do
+      subject { super().term }
+
+      it "should parse a directive" do
+        expect(subject.parse("-all")).to be == {
+          qualifier: '-',
+          mechanism: {name: "all"}
+        }
+      end
+
+      it "should also parse a modifier" do
+        expect(subject.parse('redirect=_spf.example.com')).to be == {
+          modifier: {
+            name: 'redirect',
+            value: {domain: [{literal: '_spf.example.com'}]}
+          }
+        }
+      end
+    end
+
+    describe "directive" do
+      subject { super().directive }
+
+      it "should parse a mechanism" do
+        expect(subject.parse("all")).to be == {
+          mechanism: {name: "all"}
+        }
+      end
+
+      it "should parse a mechanism with a qualifier" do
+        expect(subject.parse("-all")).to be == {
+          qualifier: '-',
+          mechanism: {name: "all"}
+        }
       end
     end
 
@@ -22,6 +108,109 @@ describe Parser do
 
       it "should match other characters" do
         expect { subject.parse('x') }.to raise_error(Parslet::ParseFailed)
+      end
+    end
+
+    describe "mechanism" do
+      subject { super().mechanism }
+
+      it "should parse a mechanism" do
+        expect(subject.parse('all')).to be == {mechanism: {name: 'all'}}
+      end
+    end
+
+    describe "all" do
+      subject { super().all }
+
+      it "should parse \"all\"" do
+        expect(subject.parse('all')).to be == {name: 'all'}
+      end
+    end
+
+    describe "include" do
+      subject { super().include }
+
+      let(:domain) { 'example.com' }
+
+      it "should parse \"include:domain\"" do
+        expect(subject.parse("include:#{domain}")).to be == {
+          name: 'include',
+          value: {domain: [{literal: domain}]}
+        }
+      end
+    end
+
+    describe "a" do
+      subject { super().a }
+
+      let(:domain) { 'example.com' }
+
+      it "should parse \"a:domain\"" do
+        expect(subject.parse("a:#{domain}")).to be == {
+          name: 'a',
+          value: {
+            domain: [{literal: domain}],
+            cidr_length: ''
+          }
+        }
+      end
+
+      let(:cidr_length) { '30' }
+
+      it "should parse \"a:domain/cidr-length\"" do
+        expect(subject.parse("a:#{domain}/#{cidr_length}")).to be == {
+          name: 'mx',
+          value: {
+            domain: [{literal: domain}],
+            cidr_length: "/#{cidr_length}"
+          }
+        }
+      end
+
+      it "should parse \"a:/cidr-length\"" do
+        expect(subject.parse("a:/#{cidr_length}")).to be == {
+          name: 'mx',
+          value: {
+            cidr_length: "/#{cidr_length}"
+          }
+        }
+      end
+    end
+
+    describe "mx" do
+      subject { super().mx }
+
+      let(:domain) { 'example.com' }
+
+      it "should parse \"mx:domain\"" do
+        expect(subject.parse("mx:#{domain}")).to be == {
+          name: 'mx',
+          value: {
+            domain: [{literal: domain}],
+            cidr_length: ''
+          }
+        }
+      end
+
+      let(:cidr_length) { '30' }
+
+      it "should parse \"mx:domain/cidr-length\"" do
+        expect(subject.parse("mx:#{domain}/#{cidr_length}")).to be == {
+          name: 'mx',
+          value: {
+            domain: [{literal: domain}],
+            cidr_length: "/#{cidr_length}"
+          }
+        }
+      end
+
+      it "should parse \"mx:/cidr-length\"" do
+        expect(subject.parse("mx:/#{cidr_length}")).to be == {
+          name: 'mx',
+          value: {
+            cidr_length: "/#{cidr_length}"
+          }
+        }
       end
     end
 
@@ -98,6 +287,16 @@ describe Parser do
     end
 
     describe "modifier" do
+      subject { super().modifier }
+
+      it "should parse a modifier" do
+        expect(subject.parse('redirect=_spf.example.com')).to be == {
+          modifier: {
+            name: 'redirect',
+            value: {domain: [{literal: '_spf.example.com'}]}
+          }
+        }
+      end
     end
 
     describe "redirect" do
