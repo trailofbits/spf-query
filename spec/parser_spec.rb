@@ -150,7 +150,6 @@ describe Parser do
           name: 'a',
           value: {
             domain: [{literal: domain}],
-            cidr_length: ''
           }
         }
       end
@@ -159,19 +158,18 @@ describe Parser do
 
       it "should parse \"a:domain/cidr-length\"" do
         expect(subject.parse("a:#{domain}/#{cidr_length}")).to be == {
-          name: 'mx',
+          name: 'a',
           value: {
-            domain: [{literal: domain}],
-            cidr_length: "/#{cidr_length}"
+            domain: [{literal: "#{domain}/#{cidr_length}"}]
           }
         }
       end
 
       it "should parse \"a:/cidr-length\"" do
         expect(subject.parse("a:/#{cidr_length}")).to be == {
-          name: 'mx',
+          name: 'a',
           value: {
-            cidr_length: "/#{cidr_length}"
+            domain: [{literal: "/#{cidr_length}"}]
           }
         }
       end
@@ -186,8 +184,7 @@ describe Parser do
         expect(subject.parse("mx:#{domain}")).to be == {
           name: 'mx',
           value: {
-            domain: [{literal: domain}],
-            cidr_length: ''
+            domain: [{literal: domain}]
           }
         }
       end
@@ -198,8 +195,7 @@ describe Parser do
         expect(subject.parse("mx:#{domain}/#{cidr_length}")).to be == {
           name: 'mx',
           value: {
-            domain: [{literal: domain}],
-            cidr_length: "/#{cidr_length}"
+            domain: [{literal: "#{domain}/#{cidr_length}"}]
           }
         }
       end
@@ -208,7 +204,7 @@ describe Parser do
         expect(subject.parse("mx:/#{cidr_length}")).to be == {
           name: 'mx',
           value: {
-            cidr_length: "/#{cidr_length}"
+            domain: [{literal: "/#{cidr_length}"}]
           }
         }
       end

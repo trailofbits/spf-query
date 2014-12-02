@@ -54,7 +54,7 @@ module SPFParse
       str('mx').as(:name) >>
       (
         (str(':') >> domain_spec).maybe >>
-         dual_cidr_length.as(:cidr_length).maybe
+         dual_cidr_length.maybe
       ).as(:value)
     end
 
