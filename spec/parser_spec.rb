@@ -25,6 +25,149 @@ describe Parser do
       end
     end
 
+    describe "ip4" do
+      subject { super().ip4 }
+
+      let(:ip) { '1.2.3.4' }
+
+      it "should parse \"ip4:IPv4\"" do
+        expect(subject.parse("ip4:#{ip}")).to be == {
+          name: 'ip4',
+          value: {ip: ip}
+        }
+      end
+    end
+
+    describe "ip6" do
+      subject { super().ip6 }
+
+      let(:ip) { '2001:0db8:85a3:0000:0000:8a2e:0370:7334' }
+
+      it "should parse \"ip6:IPv6\"" do
+        expect(subject.parse("ip6:#{ip}")).to be == {
+          name: 'ip6',
+          value: {ip: ip}
+        }
+      end
+    end
+
+    describe "ipv4_cidr_length" do
+      subject { super().ipv4_cidr_length }
+
+      it "should not match \"/\"" do
+        expect { subject.parse("/") }.to raise_error(Parslet::ParseFailed)
+      end
+
+      it "should match \"/1\"" do
+        expect(subject.parse("/1")).to be == "/1"
+      end
+
+      it "should match \"/123\"" do
+        expect(subject.parse("/123")).to be == "/123"
+      end
+    end
+
+    describe "ipv6_cidr_length" do
+      subject { super().ipv6_cidr_length }
+
+      it "should not match \"/\"" do
+        expect { subject.parse("/") }.to raise_error(Parslet::ParseFailed)
+      end
+
+      it "should match \"/1\"" do
+        expect(subject.parse("/1")).to be == "/1"
+      end
+
+      it "should match \"/123\"" do
+        expect(subject.parse("/123")).to be == "/123"
+      end
+    end
+
+    describe "exists" do
+      subject { super().exists }
+
+      it "should parse \"exists:domain\"" do
+        expect(subject.parse('exists:%{ir}.sbl.spamhaus.example.org')).to be == {
+          name: 'exists',
+          value: {domain: [
+            {macro: {letter: 'i', transformers: {reverse: 'r'}}},
+            {literal: '.sbl.spamhaus.example.org'}
+          ]}
+        }
+      end
+    end
+
+    describe "modifier" do
+    end
+
+    describe "redirect" do
+      subject { super().redirect }
+
+      it "should parse \"redirect=domain\"" do
+        expect(subject.parse('redirect=_spf.example.com')).to be == {
+          name: 'redirect',
+          value: {domain: [{literal: '_spf.example.com'}]}
+        }
+      end
+    end
+
+    describe "explanation" do
+      subject { super().explanation }
+
+      it "should parse \"exp=domain\"" do
+        expect(subject.parse("exp=explain._spf.%{d}")).to be == {
+          name: 'exp',
+          value: {domain: [
+            {literal: 'explain._spf.'},
+            {macro: {letter: 'd', transformers: ''}}
+          ]}
+        }
+      end
+    end
+
+    describe "unknown_modifier" do
+      subject { super().unknown_modifier }
+
+      it "should parse \"name=\"" do
+        expect(subject.parse("foo=")).to be == {name: 'foo', value: nil}
+      end
+
+      it "should parse \"name=value\"" do
+        expect(subject.parse("foo=bar")).to be == {
+          name: 'foo',
+          value: [{literal: 'bar'}]
+        }
+      end
+    end
+
+    describe "domain_spec" do
+      subject { super().domain_spec }
+
+      it "should not parse \"\"" do
+        expect { subject.parse('') }.to raise_error(Parslet::ParseFailed)
+      end
+
+      it "should parse macro_literals" do
+        expect(subject.parse('AAA')).to be == {domain: [{literal: 'AAA'}]}
+      end
+
+      it "should parse macro_expands" do
+        expect(subject.parse('%{s}%{d}')).to be == {domain: [
+          {macro: {letter: 's', transformers: ''}},
+          {macro: {letter: 'd', transformers: ''}}
+        ]}
+      end
+
+      it "should parse a mixture of macro_literals and macro_expands" do
+        expect(subject.parse('foo.%{s}.bar.%{d}')).to be == {domain: [
+          {literal: 'foo.'},
+          {macro: {letter: 's', transformers: ''}},
+          {literal: '.bar.'},
+          {macro: {letter: 'd', transformers: ''}}
+        ]}
+      end
+    end
+
     describe "name" do
       subject { super().name }
 
@@ -32,6 +175,118 @@ describe Parser do
         it "should parse #{str.inspect}" do
           expect(subject.parse(str)).to be == str
         end
+      end
+    end
+
+    describe "macro_string" do
+      subject { super().macro_string }
+
+      it "should not parse ''" do
+        expect { subject.parse('') }.to raise_error(Parslet::ParseFailed)
+      end
+
+      it "should parse macro_literals" do
+        expect(subject.parse('AAA')).to be == [{literal: 'AAA'}]
+      end
+
+      it "should parse macro_expands" do
+        expect(subject.parse('%{s}%{d}')).to be == [
+          {macro: {letter: 's', transformers: ''}},
+          {macro: {letter: 'd', transformers: ''}}
+        ]
+      end
+
+      it "should parse a mixture of macro_literals and macro_expands" do
+        expect(subject.parse('foo.%{s}.bar.%{d}')).to be == [
+          {literal: 'foo.'},
+          {macro: {letter: 's', transformers: ''}},
+          {literal: '.bar.'},
+          {macro: {letter: 'd', transformers: ''}}
+        ]
+      end
+    end
+
+    describe "macro_string?" do
+      subject { super().macro_string? }
+
+      it "should parse ''" do
+        expect(subject.parse('')).to be == ''
+      end
+    end
+
+    describe "macro_expand" do
+      subject { super().macro_expand }
+
+      %w[%% %_ %-].each do |str|
+        it "should parse #{str.inspect}" do
+          expect(subject.parse(str)).to be == {macro: str}
+        end
+      end
+
+      it "should parse \"%{s}\"" do
+        expect(subject.parse("%{s}")).to be == {
+          macro: {
+            letter: 's',
+            transformers: ''
+          }
+        }
+      end
+
+      it "should parse \"%{d4}\"" do
+        expect(subject.parse("%{d4}")).to be == {
+          macro: {
+            letter: 'd', 
+            transformers: {digits: '4'}
+          }
+        }
+      end
+
+      it "should parse \"%{dr}\"" do
+        expect(subject.parse("%{dr}")).to be == {
+          macro: {
+            letter: 'd', 
+            transformers: {reverse: 'r'}
+          }
+        }
+      end
+
+      it "should parse \"%{d2r}\"" do
+        expect(subject.parse("%{d2r}")).to be == {
+          macro: {
+            letter: 'd', 
+            transformers: {digits: '2', reverse: 'r'}
+          }
+        }
+      end
+
+      it "should parse \"%{l-}\"" do
+        expect(subject.parse("%{l-}")).to be == {
+          macro: {
+            letter: 'l', 
+            transformers: '',
+            delimiters: [{char: '-'}]
+          }
+        }
+      end
+
+      it "should parse \"%{lr-}\"" do
+        expect(subject.parse("%{lr-}")).to be == {
+          macro: {
+            letter: 'l', 
+            transformers: {reverse: 'r'},
+            delimiters: [{char: '-'}]
+          }
+        }
+      end
+
+      it "should parse \"%{l1r-}\"" do
+        expect(subject.parse("%{l1r-}")).to be == {
+          macro: {
+            letter: 'l', 
+            transformers: {digits: '1', reverse: 'r'},
+            delimiters: [{char: '-'}]
+          }
+        }
       end
     end
 
@@ -50,7 +305,7 @@ describe Parser do
 
       %w[s l o d i p h c r t].each do |char|
         it "should recognize the '#{char}' char" do
-          expect(subject.parse(char)).to be == {letter: char}
+          expect(subject.parse(char)).to be == char
         end
       end
     end
@@ -59,27 +314,27 @@ describe Parser do
       subject { super().transformers }
 
       it "should parse \"\"" do
-        expect(subject.parse("")).to be == {digit: nil}
+        expect(subject.parse("")).to be == ""
       end
 
       it "should parse a single digit" do
-        expect(subject.parse("1")).to be == {digit: "1"}
+        expect(subject.parse("1")).to be == {digits: "1"}
       end
 
       it "should parse a multiple digits" do
-        expect(subject.parse("123")).to be == {digit: "123"}
+        expect(subject.parse("123")).to be == {digits: "123"}
       end
 
       it "should parse 'r'" do
-        expect(subject.parse("r")).to be == {digit: nil, reverse: "r"}
+        expect(subject.parse("r")).to be == {reverse: "r"}
       end
 
       it "should parse a single digit then 'r'" do
-        expect(subject.parse("1r")).to be == {digit: "1", reverse: "r"}
+        expect(subject.parse("1r")).to be == {digits: "1", reverse: "r"}
       end
 
       it "should parse a multiple digits then 'r'" do
-        expect(subject.parse("123r")).to be == {digit: "123", reverse: "r"}
+        expect(subject.parse("123r")).to be == {digits: "123", reverse: "r"}
       end
     end
 

@@ -69,8 +69,8 @@ module SPFParse
     #
     #   IP4              = "ip4"      ":" ip4-network   [ ip4-cidr-length ]
     #
-    rule(:ipv4) do
-      str('ipv4').as(:name) >> str(':') >> (ipv4_address >> ipv4_cidr_length.maybe).as(:value)
+    rule(:ip4) do
+      str('ip4').as(:name) >> str(':') >> (ipv4_address >> ipv4_cidr_length.maybe).as(:ip).as(:value)
     end
 
     #
@@ -78,15 +78,15 @@ module SPFParse
     #
     #   IP6              = "ip6"      ":" ip6-network   [ ip6-cidr-length ]
     #
-    rule(:ipv6) do
-      str('ipv6').as(:name) >> str(':') >> (ipv6_address >> ipv6_cidr_length.maybe).as(:value)
+    rule(:ip6) do
+      str('ip6').as(:name) >> str(':') >> (ipv6_address >> ipv6_cidr_length.maybe).as(:ip).as(:value)
     end
 
-    rule(:ipv4_cidr_length) { str('/') >> digit.repeat(1) }
-    rule(:ipv6_cidr_length) { str('/') >> digit.repeat(1) }
     rule(:dual_cidr_length) do
       ipv4_cidr_length.maybe >> (str('/') >> ipv6_cidr_length).maybe
     end
+    rule(:ipv4_cidr_length) { str('/') >> digit.repeat(1) }
+    rule(:ipv6_cidr_length) { str('/') >> digit.repeat(1) }
 
     #
     # Section 5.7:
@@ -104,7 +104,9 @@ module SPFParse
     rule(:explanation) do
       str('exp').as(:name) >> str('=') >> domain_spec.as(:value)
     end
-    rule(:unknown_modifier) { name >> equals >> macro_string? }
+    rule(:unknown_modifier) do
+      name.as(:name) >> equals >> macro_string?.as(:value)
+    end
 
     rule(:domain_spec) { macro_string.as(:domain) }
     rule(:name) { alpha >> (alpha | digit | match['-_\.'] ).repeat(0) }
@@ -115,24 +117,24 @@ module SPFParse
     # See RFC 4408, Section 8.1.
     #
     rule(:macro_string) do
-      (macro_expand | macro_literal.repeat(1).as(:text)).repeat(1)
+      (macro_expand | macro_literal.repeat(1).as(:literal)).repeat(1)
     end
     rule(:macro_string?) { macro_string.maybe }
     rule(:macro_expand) do
       (
         (
           str('%{') >>
-          macro_letter >>
+          macro_letter.as(:letter) >>
           transformers.as(:transformers) >>
-          delimiter.repeat(0).as(:delimiters) >>
+          delimiter.repeat(1).as(:delimiters).maybe >>
           str('}')
         ) | str('%%') | str('%_') | str('%-')
       ).as(:macro)
     end
     rule(:macro_literal) { match['\x21-\x24'] | match['\x26-\x7e'] }
-    rule(:macro_letter) { match['slodiphcrt'].as(:letter) }
+    rule(:macro_letter) { match['slodiphcrt'] }
     rule(:transformers) do
-      digit.repeat(1).maybe.as(:digit) >> str('r').as(:reverse).maybe
+      digit.repeat(1).as(:digits).maybe >> str('r').as(:reverse).maybe
     end
     rule(:delimiter) { match['-\.+,/_='].as(:char) }
 
