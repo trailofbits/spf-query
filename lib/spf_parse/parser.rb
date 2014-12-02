@@ -140,7 +140,7 @@ module SPFParse
     rule(:macro_literal) { match['\x21-\x24'] | match['\x26-\x7e'] }
     rule(:macro_letter) { match['slodiphcrt'].as(:letter) }
     rule(:transformers) do
-      digit.repeat(0).as(:digit) >> str('r').as(:reverse).maybe
+      digit.repeat(1).maybe.as(:digit) >> str('r').as(:reverse).maybe
     end
     rule(:delimiter) { match['-\.+,/_='].as(:char) }
 
