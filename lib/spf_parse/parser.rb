@@ -1,4 +1,5 @@
 require 'parslet'
+require 'ipaddr'
 
 module SPFParse
   class Parser < Parslet::Parser
@@ -73,7 +74,7 @@ module SPFParse
     #   IP4              = "ip4"      ":" ip4-network   [ ip4-cidr-length ]
     #
     rule(:ip4) do
-      str('ip4').as(:name) >> str(':') >> (ipv4_address >> ipv4_cidr_length.maybe).as(:ip).as(:value)
+      str('ip4').as(:name) >> str(':') >> (ipv4_address >> ipv4_cidr_length.maybe).as(:value)
     end
 
     #
@@ -82,14 +83,14 @@ module SPFParse
     #   IP6              = "ip6"      ":" ip6-network   [ ip6-cidr-length ]
     #
     rule(:ip6) do
-      str('ip6').as(:name) >> str(':') >> (ipv6_address >> ipv6_cidr_length.maybe).as(:ip).as(:value)
+      str('ip6').as(:name) >> str(':') >> (ipv6_address >> ipv6_cidr_length.maybe).as(:value)
     end
 
     rule(:dual_cidr_length) do
       ipv4_cidr_length.maybe >> (str('/') >> ipv6_cidr_length).maybe
     end
-    rule(:ipv4_cidr_length) { str('/') >> digit.repeat(1) }
-    rule(:ipv6_cidr_length) { str('/') >> digit.repeat(1) }
+    rule(:ipv4_cidr_length) { str('/') >> digit.repeat(1).as(:cidr_length) }
+    rule(:ipv6_cidr_length) { str('/') >> digit.repeat(1).as(:cidr_length) }
 
     #
     # Section 5.7:
@@ -149,10 +150,12 @@ module SPFParse
     # See https://github.com/kschiess/parslet/blob/master/example/ip_address.rb
     #
     rule(:ipv4_address) do
-      dec_octet >> str('.') >>
-      dec_octet >> str('.') >>
-      dec_octet >> str('.') >>
-      dec_octet
+      (
+        dec_octet >> str('.') >>
+        dec_octet >> str('.') >>
+        dec_octet >> str('.') >>
+        dec_octet
+      ).as(:ip)
     end
 
     rule(:dec_octet) do
@@ -177,7 +180,7 @@ module SPFParse
 
         ((h16 >> h16l(5)).maybe >> dcolon >> h16) |
         ((h16 >> h16l(6)).maybe >> dcolon)
-      )
+      ).as(:ip)
     end
 
     rule(:h16) { hexdigit.repeat(1,4) }

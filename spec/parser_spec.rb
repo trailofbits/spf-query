@@ -215,10 +215,19 @@ describe Parser do
 
       let(:ip) { '1.2.3.4' }
 
-      it "should parse \"ip4:IPv4\"" do
+      it "should parse \"ip4:ip\"" do
         expect(subject.parse("ip4:#{ip}")).to be == {
           name: 'ip4',
           value: {ip: ip}
+        }
+      end
+
+      let(:cidr_length) { '24' }
+
+      it "should parse \"ip4:ip/cidr-length\"" do
+        expect(subject.parse("ip4:#{ip}/#{cidr_length}")).to be == {
+          name: 'ip4',
+          value: {ip: ip, cidr_length: cidr_length}
         }
       end
     end
@@ -228,10 +237,19 @@ describe Parser do
 
       let(:ip) { '2001:0db8:85a3:0000:0000:8a2e:0370:7334' }
 
-      it "should parse \"ip6:IPv6\"" do
+      it "should parse \"ip6:ip\"" do
         expect(subject.parse("ip6:#{ip}")).to be == {
           name: 'ip6',
           value: {ip: ip}
+        }
+      end
+
+      let(:cidr_length) { '32' }
+
+      it "should parse \"ip6:ip/cidr-length\"" do
+        expect(subject.parse("ip6:#{ip}/#{cidr_length}")).to be == {
+          name: 'ip6',
+          value: {ip: ip, cidr_length: cidr_length}
         }
       end
     end
@@ -244,11 +262,11 @@ describe Parser do
       end
 
       it "should match \"/1\"" do
-        expect(subject.parse("/1")).to be == "/1"
+        expect(subject.parse("/1")).to be == {cidr_length: '1'}
       end
 
       it "should match \"/123\"" do
-        expect(subject.parse("/123")).to be == "/123"
+        expect(subject.parse("/123")).to be == {cidr_length: '123'}
       end
     end
 
@@ -260,11 +278,11 @@ describe Parser do
       end
 
       it "should match \"/1\"" do
-        expect(subject.parse("/1")).to be == "/1"
+        expect(subject.parse("/1")).to be == {cidr_length: '1'}
       end
 
       it "should match \"/123\"" do
-        expect(subject.parse("/123")).to be == "/123"
+        expect(subject.parse("/123")).to be == {cidr_length: '123'}
       end
     end
 
