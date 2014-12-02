@@ -5,35 +5,35 @@ module SPFParse
 
     root :record
     rule(:record)    { version >> sp.repeat(1) >> terms >> sp.repeat(0) }
-    rule(:version)   { str('v=spf1') }
+    rule(:version)   { str('v=') >> str('spf1').as(:version) }
     rule(:terms)     { term >> (sp.repeat(1) >> term).repeat(0) }
     rule(:term)      { directive | modifier }
     rule(:directive) { qualifier.maybe >> mechanism }
-
-    rule(:qualifier) do
-      str('+') |
-      str('-') |
-      str('~') |
-      str('?')
-    end
+    rule(:qualifier) { match['+\-~?'].as(:qualifier) }
 
     rule(:mechanism) do
-      str('all')    |
-      include       |
-      a |
-      mx |
-      ptr |
-      ipv4 |
-      ipv6 |
-      exists
+      (
+        all     |
+        include |
+        a       |
+        mx      |
+        ptr     |
+        ipv4    |
+        ipv6    |
+        exists
+      ).as(:mechanism)
     end
+
+    rule(:all) { str('all').as(:name) }
 
     #
     # Section 5.2:
     #
     #   include          = "include"  ":" domain-spec
     #
-    rule(:include) { str('include') >> str(':') >> domain_spec }
+    rule(:include) do
+      str('include').as(:name) >> str(':') >> domain_spec.as(:value)
+    end
 
     #
     # Section 5.3:
@@ -41,7 +41,8 @@ module SPFParse
     #   A                = "a"      [ ":" domain-spec ] [ dual-cidr-length ]
     #
     rule(:a) do
-      str('a') >> (str(':') >> domain_spec).maybe >> dual_cidr_length.maybe
+      str('a').as(:name) >>
+      ((str(':') >> domain_spec).maybe >> dual_cidr_length.maybe).as(:value)
     end
 
     #
@@ -50,7 +51,8 @@ module SPFParse
     #   MX               = "mx"     [ ":" domain-spec ] [ dual-cidr-length ]
     #
     rule(:mx) do
-      str('mx') >> (str(':') >> domain_spec).maybe >> dual_cidr_length.maybe
+      str('mx').as(:name) >>
+      ((str(':') >> domain_spec).maybe >> dual_cidr_length.maybe).as(:value)
     end
 
     #
@@ -59,7 +61,7 @@ module SPFParse
     #   PTR              = "ptr"    [ ":" domain-spec ]
     #
     rule(:ptr) do
-      str('ptr') >> (str(':') >> domain_spec).maybe
+      str('ptr').as(:name) >> (str(':') >> domain_spec.as(:value)).maybe
     end
 
     #
@@ -68,7 +70,7 @@ module SPFParse
     #   IP4              = "ip4"      ":" ip4-network   [ ip4-cidr-length ]
     #
     rule(:ipv4) do
-      str('ipv4') >> str(':') >> ipv4_address >> ipv4_cidr_length.maybe
+      str('ipv4').as(:name) >> str(':') >> (ipv4_address >> ipv4_cidr_length.maybe).as(:value)
     end
 
     #
@@ -77,7 +79,7 @@ module SPFParse
     #   IP6              = "ip6"      ":" ip6-network   [ ip6-cidr-length ]
     #
     rule(:ipv6) do
-      str('ipv6') >> str(':') >> ipv6_address >> ipv6_cidr_length.maybe
+      str('ipv6').as(:name) >> str(':') >> (ipv6_address >> ipv6_cidr_length.maybe).as(:value)
     end
 
     rule(:ipv4_cidr_length) { str('/') >> digit.repeat(1) }
@@ -92,12 +94,16 @@ module SPFParse
     #   exists           = "exists"   ":" domain-spec
     #   
     rule(:exists) do
-      str('exists') >> str(':') >> domain_spec
+      str('exists').as(:name) >> str(':') >> domain_spec.as(:value)
     end
 
     rule(:modifier) { redirect | explanation | unknown_modifier }
-    rule(:redirect) { str('redirect') >> str('=') >> domain_spec }
-    rule(:explanation) { str('exp') >> str('=') >> domain_spec }
+    rule(:redirect) do
+      str('redirect').as(:name) >> str('=') >> domain_spec.as(:value)
+    end
+    rule(:explanation) do
+      str('exp').as(:name) >> str('=') >> domain_spec.as(:value)
+    end
     rule(:unknown_modifier) { name >> equals >> macro_string }
 
     rule(:domain_spec) { macro_string >> domain_end }
@@ -117,16 +123,26 @@ module SPFParse
     #
     # See RFC 4408, Section 8.1.
     #
-    rule(:explain_string) { (macro_string | sp).repeat(0) }
-    rule(:macro_string)   { (macro_expand | macro_literal).repeat(0) }
+    rule(:macro_string) do
+      (macro_expand | macro_literal.repeat(1).as(:text)).repeat(0)
+    end
     rule(:macro_expand) do
-      (str('%{') >> macro_letter >> transformers >> delimiter.repeat(0) >> str('}')) |
-      str('%%') | str('%_') | str('%-')
+      (
+        (
+          str('%{') >>
+          macro_letter >>
+          transformers.as(:transformers) >>
+          delimiter.repeat(0).as(:delimiters) >>
+          str('}')
+        ) | str('%%') | str('%_') | str('%-')
+      ).as(:macro)
     end
     rule(:macro_literal) { match['\x21-\x24'] | match['\x26-\x7e'] }
-    rule(:macro_letter) { match['slodiphcrt'] }
-    rule(:transformers) { digit.repeat(0) >> str('r').maybe }
-    rule(:delimiter) { match['-\.+,/_='] }
+    rule(:macro_letter) { match['slodiphcrt'].as(:letter) }
+    rule(:transformers) do
+      digit.repeat(0).as(:digit) >> str('r').as(:reverse).maybe
+    end
+    rule(:delimiter) { match['-\.+,/_='].as(:char) }
 
     # 
     # IP rules:
