@@ -3,6 +3,7 @@ require 'spf_parse/macro'
 require 'spf_parse/macro_string'
 require 'spf_parse/modifier'
 require 'spf_parse/directive'
+require 'spf_parse/record'
 
 require 'parslet'
 
@@ -252,13 +253,22 @@ module SPFParse
       end
 
       rule(version: simple(:version), rules: subtree(:rules)) do
-        {version: version.to_sym, rules: rules}
+        Record.new(version.to_sym, Array(rules))
       end
 
     end
 
-    def self.parse(string)
-      Transform.new.apply(new.parse(string))
+    #
+    # Parses the SPF record.
+    #
+    # @param [String] spf
+    #   The raw SPF record.
+    #
+    # @return [Record]
+    #   The parsed SPF record.
+    #
+    def self.parse(spf)
+      Transform.new.apply(new.parse(spf))
     end
 
   end
