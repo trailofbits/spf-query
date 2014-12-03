@@ -63,7 +63,10 @@ module SPF
         [domain, "_spf.#{domain}"].each do |host|
           begin
             spf = resolver.getresource(host, Resolv::DNS::Resource::IN::TXT).strings.join
-            return parse(spf)
+
+            if spf.include?('v=spf1')
+              return parse(spf)
+            end
           rescue Resolv::ResolvError
           end
         end
