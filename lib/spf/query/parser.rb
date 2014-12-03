@@ -245,12 +245,7 @@ module SPF
         rule(directive: subtree(:options)) do
           name      = options.delete(:name).to_sym
           value     = options[:value]
-          qualifier = case options[:qualifier]
-                      when '+' then :pass
-                      when '-' then :fail
-                      when '~' then :soft_fail
-                      when '?' then :neutral
-                      end
+          qualifier = Directive::QUALIFIERS[options[:qualifier]]
 
           Directive.new(name, value: value, qualifier: qualifier)
         end
