@@ -12,7 +12,7 @@ The `spf-query` library searches the spf records for a host. We assume the host 
 ___
 -use a single domain
 
-    spf google.com
+    spf-query google.com
     ____________________________
     SPF record search for google.com
       - found SPF record for google.com at google.com:
@@ -22,7 +22,7 @@ ___
 
 -or a bunch in a row
 
-    spf trailofbits.com facebook.com yahoo.com
+    spf-query trailofbits.com facebook.com yahoo.com
     ____________________________
     SPF record search for trailofbits.com
       - found SPF record for trailofbits.com at trailofbits.com:
@@ -42,16 +42,16 @@ ___
     ____________________________
 
 ###In a project
-___
-    require 'spf-query'
+
+    require 'spf/query'
     
-    SPFParse.check_host('twitter.com')
-     => {:record=>"v=spf1 ip4:199.16.156.0/22 ip4:199.59.148.0/22 ip4:8.25.194.0/23 ip4:8.25.196.0/23 ip4:204.92.114.203 ip4:204.92.114.204/31 ip4:107.20.52.15 ip4:23.21.83.90 include:_spf.google.com include:_thirdparty.twitter.com -all", :record_path=>"twitter.com"}
+    SPF::Query::Record.query('twitter.com')
+    => #<SPF::Query::Record:0x00000002177440 @version=:spf1, @rules=[#<SPF::Query::Directive:0x00000001ffbdf0 @name=:ip4, @value=#<SPF::Query::IP:0x00000001fed408 @address="199.16.156.0"@11, @cidr_length=22>, @qualifier=nil>, #<SPF::Query::Directive:0x00000001ff8358 @name=:ip4, @value=#<SPF::Query::IP:0x00000001ff9870 @address="199.59.148.0"@31, @cidr_length=22>, @qualifier=nil>, #<SPF::Query::Directive:0x00000001ffc750 @name=:ip4, @value=#<SPF::Query::IP:0x00000001ffdcb8 @address="8.25.194.0"@51, @cidr_length=23>, @qualifier=nil>, #<SPF::Query::Directive:0x00000002106998 @name=:ip4, @value=#<SPF::Query::IP:0x00000002001728 @address="8.25.196.0"@69, @cidr_length=23>, @qualifier=nil>, #<SPF::Query::Directive:0x0000000212a230 @name=:ip4, @value=#<SPF::Query::IP:0x0000000212ba40 @address="204.92.114.203"@87, @cidr_length=nil>, @qualifier=nil>, #<SPF::Query::Directive:0x00000002141a48 @name=:ip4, @value=#<SPF::Query::IP:0x00000002142f60 @address="204.92.114.204"@106, @cidr_length=31>, @qualifier=nil>, #<SPF::Query::Directive:0x0000000214abe8 @name=:ip4, @value=#<SPF::Query::IP:0x00000002140170 @address="107.20.52.15"@128, @cidr_length=nil>, @qualifier=nil>, #<SPF::Query::Directive:0x00000002157d98 @name=:ip4, @value=#<SPF::Query::IP:0x00000002149310 @address="23.21.83.90"@145, @cidr_length=nil>, @qualifier=nil>, #<SPF::Query::Directive:0x00000002163918 @name=:include, @value="_spf.google.com"@165, @qualifier=nil>, #<SPF::Query::Directive:0x0000000216b4b0 @name=:include, @value="_thirdparty.twitter.com"@189, @qualifier=nil>, #<SPF::Query::Directive:0x00000002168b20 @name=:all, @value=nil, @qualifier=:fail>]>
         
 
 ## Install
 
-    rake install
+    $ gem install spf-query
 
 ## License
 
