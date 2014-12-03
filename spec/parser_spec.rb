@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'spf_parse/parser'
+require 'spf/query/parser'
 
 describe Parser do
   describe "rules" do

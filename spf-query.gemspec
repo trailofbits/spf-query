@@ -1,20 +1,20 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'spf_parse/version'
+require 'spf/query/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "spf_parse"
-  gem.version       = SPFParse::VERSION
+  gem.name          = "spf-query"
+  gem.version       = SPF::Query::VERSION
   gem.authors       = ["nicktitle"]
   gem.email         = ["nick.esposito@trailofbits.com"]
   gem.summary       = %q{SPF Retriever and Parser}
   gem.description   = %q{Search and retrieve SPF records for any number of hosts}
-  gem.homepage      = "https://github.com/trailofbits/spf_parse#readme"
+  gem.homepage      = "https://github.com/trailofbits/spf-query#readme"
   gem.license       = "MIT"
 
   gem.files         = `git ls-files -z`.split("\x0")
-  gem.executables   = ['spf']
+  gem.executables   = ['spf-query']
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
   gem.required_ruby_version = '>= 1.9.1'

@@ -4,9 +4,9 @@ if ENV['CODECLIMATE_REPO_TOKEN']
 end
 
 require 'rspec'
-require 'spf_parse'
+require 'spf/query'
 
-include SPFParse
+include SPF::Query
 
 RSpec.configure do |specs|
   specs
