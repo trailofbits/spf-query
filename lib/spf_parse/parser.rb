@@ -1,28 +1,31 @@
+require 'spf_parse/ip'
+require 'spf_parse/macro'
+require 'spf_parse/macro_string'
+require 'spf_parse/modifier'
+require 'spf_parse/directive'
+
 require 'parslet'
-require 'ipaddr'
 
 module SPFParse
   class Parser < Parslet::Parser
 
     root :record
-    rule(:record)    { version >> sp.repeat(1) >> terms >> sp.repeat(0) }
+    rule(:record)    { version >> sp.repeat(1) >> terms.as(:rules) >> sp.repeat(0) }
     rule(:version)   { str('v=') >> str('spf1').as(:version) }
     rule(:terms)     { term >> (sp.repeat(1) >> term).repeat(0) }
     rule(:term)      { directive | modifier }
-    rule(:directive) { qualifier.maybe >> mechanism }
+    rule(:directive) { (qualifier.maybe >> mechanism).as(:directive) }
     rule(:qualifier) { match['+\-~?'].as(:qualifier) }
 
     rule(:mechanism) do
-      (
-        all     |
-        include |
-        a       |
-        mx      |
-        ptr     |
-        ip4     |
-        ip6     |
-        exists
-      ).as(:mechanism)
+      all     |
+      include |
+      a       |
+      mx      |
+      ptr     |
+      ip4     |
+      ip6     |
+      exists
     end
 
     rule(:all) { str('all').as(:name) }
@@ -102,7 +105,8 @@ module SPFParse
     end
 
     rule(:modifier) do
-      (redirect | explanation | unknown_modifier).as(:modifier)
+      (redirect | explanation).as(:modifier) |
+      unknown_modifier.as(:unknown_modifier)
     end
     rule(:redirect) do
       str('redirect').as(:name) >> str('=') >> domain_spec.as(:value)
@@ -114,7 +118,7 @@ module SPFParse
       name.as(:name) >> equals >> macro_string?.as(:value)
     end
 
-    rule(:domain_spec) { macro_string.as(:domain) }
+    rule(:domain_spec) { macro_string }
     rule(:name) { alpha >> (alpha | digit | match['-_\.'] ).repeat(0) }
 
     #
@@ -123,7 +127,9 @@ module SPFParse
     # See RFC 4408, Section 8.1.
     #
     rule(:macro_string) do
-      (macro_expand | macro_literal.repeat(1).as(:literal)).repeat(1)
+      (
+        (macro_expand | macro_literal.repeat(1).as(:literal)).repeat(1)
+      ).as(:macro_string)
     end
     rule(:macro_string?) { macro_string.maybe }
     rule(:macro_expand) do
@@ -131,7 +137,7 @@ module SPFParse
         (
           str('%{') >>
           macro_letter.as(:letter) >>
-          transformers.as(:transformers) >>
+          transformers >>
           delimiter.repeat(1).as(:delimiters).maybe >>
           str('}')
         ) | str('%%') | str('%_') | str('%-')
@@ -202,6 +208,57 @@ module SPFParse
 
     def h16l(times)
       (colon >> h16).repeat(0,times)
+    end
+
+    class Transform < Parslet::Transform
+
+      rule(ip: simple(:address)) { IP.new(address) }
+      rule(ip: simple(:address), cidr_length: simple(:cidr_length)) do
+        IP.new(address,cidr_length.to_i)
+      end
+
+      rule(char: simple(:c)) { c }
+      rule(literal: simple(:text)) { text }
+      rule(macro: subtree(:options)) do
+        letter = options.fetch(:letter)
+
+        Macro.new(letter,options)
+      end
+
+      rule(macro_string: [simple(:text)])     { text }
+      rule(macro_string: sequence(:elements)) { MacroString.new(elements) }
+
+      rule(unknown_modifier: {name: simple(:name), value: simple(:value)}) do
+        UnknownModifier.new(name,value)
+      end
+
+      rule(modifier: subtree(:options)) do
+        name = options.fetch(:name).to_sym
+        value = options.fetch(:value,true)
+
+        Modifier.new(name,value)
+      end
+
+      rule(directive: subtree(:options)) do
+        name      = options.delete(:name).to_sym
+        qualifier = case options[:qualifier]
+                    when '+' then :pass
+                    when '-' then :fail
+                    when '~' then :soft_fail
+                    when '?' then :neutral
+                    end
+
+        Directive.new(name,options)
+      end
+
+      rule(version: simple(:version), rules: subtree(:rules)) do
+        {version: version.to_sym, rules: rules}
+      end
+
+    end
+
+    def self.parse(string)
+      Transform.new.apply(new.parse(string))
     end
 
   end

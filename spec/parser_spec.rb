@@ -7,21 +7,25 @@ describe Parser do
       subject { super().record }
 
       it "should parse a version then multiple terms" do
-        expect(subject.parse("v=spf1 -all redirect=_spf.example.com")).to be == [
-          {version: 'spf1'},
+        expect(subject.parse("v=spf1 -all redirect=_spf.example.com")).to be == {
+          version: 'spf1',
 
-          {
-            qualifier: '-',
-            mechanism: {name: "all"}
-          },
+          rules: [
+            {
+              directive: {
+                qualifier: '-',
+                name: "all"
+              }
+            },
 
-          {
-            modifier: {
-              name: 'redirect',
-              value: {domain: [{literal: '_spf.example.com'}]}
+            {
+              modifier: {
+                name: 'redirect',
+                value: {macro_string: [{literal: '_spf.example.com'}]}
+              }
             }
-          }
-        ]
+          ]
+        }
       end
     end
 
@@ -38,22 +42,26 @@ describe Parser do
 
       it "should parse a single term" do
         expect(subject.parse("-all")).to be == {
-          qualifier: '-',
-          mechanism: {name: "all"}
+          directive: {
+            qualifier: '-',
+            name: "all"
+          }
         }
       end
 
       it "should parse multiple terms separated by one or more spaces" do
         expect(subject.parse("-all  redirect=_spf.example.com")).to be == [
           {
-            qualifier: '-',
-            mechanism: {name: "all"}
+            directive: {
+              qualifier: '-',
+              name: "all"
+            }
           },
 
           {
             modifier: {
               name: 'redirect',
-              value: {domain: [{literal: '_spf.example.com'}]}
+              value: {macro_string: [{literal: '_spf.example.com'}]}
             }
           }
         ]
@@ -65,8 +73,10 @@ describe Parser do
 
       it "should parse a directive" do
         expect(subject.parse("-all")).to be == {
-          qualifier: '-',
-          mechanism: {name: "all"}
+          directive: {
+            qualifier: '-',
+            name: "all"
+          }
         }
       end
 
@@ -74,7 +84,7 @@ describe Parser do
         expect(subject.parse('redirect=_spf.example.com')).to be == {
           modifier: {
             name: 'redirect',
-            value: {domain: [{literal: '_spf.example.com'}]}
+            value: {macro_string: [{literal: '_spf.example.com'}]}
           }
         }
       end
@@ -84,15 +94,15 @@ describe Parser do
       subject { super().directive }
 
       it "should parse a mechanism" do
-        expect(subject.parse("all")).to be == {
-          mechanism: {name: "all"}
-        }
+        expect(subject.parse("all")).to be == {directive: {name: "all"}}
       end
 
       it "should parse a mechanism with a qualifier" do
         expect(subject.parse("-all")).to be == {
-          qualifier: '-',
-          mechanism: {name: "all"}
+          directive: {
+            qualifier: '-',
+            name: "all"
+          }
         }
       end
     end
@@ -115,7 +125,7 @@ describe Parser do
       subject { super().mechanism }
 
       it "should parse a mechanism" do
-        expect(subject.parse('all')).to be == {mechanism: {name: 'all'}}
+        expect(subject.parse('all')).to be == {name: 'all'}
       end
     end
 
@@ -135,7 +145,7 @@ describe Parser do
       it "should parse \"include:domain\"" do
         expect(subject.parse("include:#{domain}")).to be == {
           name: 'include',
-          value: {domain: [{literal: domain}]}
+          value: {macro_string: [{literal: domain}]}
         }
       end
     end
@@ -149,7 +159,7 @@ describe Parser do
         expect(subject.parse("a:#{domain}")).to be == {
           name: 'a',
           value: {
-            domain: [{literal: domain}],
+            macro_string: [{literal: domain}],
           }
         }
       end
@@ -160,7 +170,7 @@ describe Parser do
         expect(subject.parse("a:#{domain}/#{cidr_length}")).to be == {
           name: 'a',
           value: {
-            domain: [{literal: "#{domain}/#{cidr_length}"}]
+            macro_string: [{literal: "#{domain}/#{cidr_length}"}]
           }
         }
       end
@@ -169,7 +179,7 @@ describe Parser do
         expect(subject.parse("a:/#{cidr_length}")).to be == {
           name: 'a',
           value: {
-            domain: [{literal: "/#{cidr_length}"}]
+            macro_string: [{literal: "/#{cidr_length}"}]
           }
         }
       end
@@ -184,7 +194,7 @@ describe Parser do
         expect(subject.parse("mx:#{domain}")).to be == {
           name: 'mx',
           value: {
-            domain: [{literal: domain}]
+            macro_string: [{literal: domain}]
           }
         }
       end
@@ -195,7 +205,7 @@ describe Parser do
         expect(subject.parse("mx:#{domain}/#{cidr_length}")).to be == {
           name: 'mx',
           value: {
-            domain: [{literal: "#{domain}/#{cidr_length}"}]
+            macro_string: [{literal: "#{domain}/#{cidr_length}"}]
           }
         }
       end
@@ -204,7 +214,7 @@ describe Parser do
         expect(subject.parse("mx:/#{cidr_length}")).to be == {
           name: 'mx',
           value: {
-            domain: [{literal: "/#{cidr_length}"}]
+            macro_string: [{literal: "/#{cidr_length}"}]
           }
         }
       end
@@ -292,8 +302,8 @@ describe Parser do
       it "should parse \"exists:domain\"" do
         expect(subject.parse('exists:%{ir}.sbl.spamhaus.example.org')).to be == {
           name: 'exists',
-          value: {domain: [
-            {macro: {letter: 'i', transformers: {reverse: 'r'}}},
+          value: {macro_string: [
+            {macro: {letter: 'i', reverse: 'r'}},
             {literal: '.sbl.spamhaus.example.org'}
           ]}
         }
@@ -307,7 +317,7 @@ describe Parser do
         expect(subject.parse('redirect=_spf.example.com')).to be == {
           modifier: {
             name: 'redirect',
-            value: {domain: [{literal: '_spf.example.com'}]}
+            value: {macro_string: [{literal: '_spf.example.com'}]}
           }
         }
       end
@@ -319,7 +329,7 @@ describe Parser do
       it "should parse \"redirect=domain\"" do
         expect(subject.parse('redirect=_spf.example.com')).to be == {
           name: 'redirect',
-          value: {domain: [{literal: '_spf.example.com'}]}
+          value: {macro_string: [{literal: '_spf.example.com'}]}
         }
       end
     end
@@ -330,9 +340,9 @@ describe Parser do
       it "should parse \"exp=domain\"" do
         expect(subject.parse("exp=explain._spf.%{d}")).to be == {
           name: 'exp',
-          value: {domain: [
+          value: {macro_string: [
             {literal: 'explain._spf.'},
-            {macro: {letter: 'd', transformers: ''}}
+            {macro: {letter: 'd'}}
           ]}
         }
       end
@@ -348,7 +358,7 @@ describe Parser do
       it "should parse \"name=value\"" do
         expect(subject.parse("foo=bar")).to be == {
           name: 'foo',
-          value: [{literal: 'bar'}]
+          value: {macro_string: [{literal: 'bar'}]}
         }
       end
     end
@@ -361,22 +371,22 @@ describe Parser do
       end
 
       it "should parse macro_literals" do
-        expect(subject.parse('AAA')).to be == {domain: [{literal: 'AAA'}]}
+        expect(subject.parse('AAA')).to be == {macro_string: [{literal: 'AAA'}]}
       end
 
       it "should parse macro_expands" do
-        expect(subject.parse('%{s}%{d}')).to be == {domain: [
-          {macro: {letter: 's', transformers: ''}},
-          {macro: {letter: 'd', transformers: ''}}
+        expect(subject.parse('%{s}%{d}')).to be == {macro_string: [
+          {macro: {letter: 's'}},
+          {macro: {letter: 'd'}}
         ]}
       end
 
       it "should parse a mixture of macro_literals and macro_expands" do
-        expect(subject.parse('foo.%{s}.bar.%{d}')).to be == {domain: [
+        expect(subject.parse('foo.%{s}.bar.%{d}')).to be == {macro_string: [
           {literal: 'foo.'},
-          {macro: {letter: 's', transformers: ''}},
+          {macro: {letter: 's'}},
           {literal: '.bar.'},
-          {macro: {letter: 'd', transformers: ''}}
+          {macro: {letter: 'd'}}
         ]}
       end
     end
@@ -399,23 +409,23 @@ describe Parser do
       end
 
       it "should parse macro_literals" do
-        expect(subject.parse('AAA')).to be == [{literal: 'AAA'}]
+        expect(subject.parse('AAA')).to be == {macro_string: [{literal: 'AAA'}]}
       end
 
       it "should parse macro_expands" do
-        expect(subject.parse('%{s}%{d}')).to be == [
-          {macro: {letter: 's', transformers: ''}},
-          {macro: {letter: 'd', transformers: ''}}
-        ]
+        expect(subject.parse('%{s}%{d}')).to be == {macro_string: [
+          {macro: {letter: 's'}},
+          {macro: {letter: 'd'}}
+        ]}
       end
 
       it "should parse a mixture of macro_literals and macro_expands" do
-        expect(subject.parse('foo.%{s}.bar.%{d}')).to be == [
+        expect(subject.parse('foo.%{s}.bar.%{d}')).to be == {macro_string: [
           {literal: 'foo.'},
-          {macro: {letter: 's', transformers: ''}},
+          {macro: {letter: 's'}},
           {literal: '.bar.'},
-          {macro: {letter: 'd', transformers: ''}}
-        ]
+          {macro: {letter: 'd'}}
+        ]}
       end
     end
 
@@ -438,10 +448,7 @@ describe Parser do
 
       it "should parse \"%{s}\"" do
         expect(subject.parse("%{s}")).to be == {
-          macro: {
-            letter: 's',
-            transformers: ''
-          }
+          macro: {letter: 's'}
         }
       end
 
@@ -449,7 +456,7 @@ describe Parser do
         expect(subject.parse("%{d4}")).to be == {
           macro: {
             letter: 'd', 
-            transformers: {digits: '4'}
+            digits: '4'
           }
         }
       end
@@ -458,7 +465,7 @@ describe Parser do
         expect(subject.parse("%{dr}")).to be == {
           macro: {
             letter: 'd', 
-            transformers: {reverse: 'r'}
+            reverse: 'r'
           }
         }
       end
@@ -467,7 +474,8 @@ describe Parser do
         expect(subject.parse("%{d2r}")).to be == {
           macro: {
             letter: 'd', 
-            transformers: {digits: '2', reverse: 'r'}
+            digits: '2',
+            reverse: 'r'
           }
         }
       end
@@ -476,7 +484,6 @@ describe Parser do
         expect(subject.parse("%{l-}")).to be == {
           macro: {
             letter: 'l', 
-            transformers: '',
             delimiters: [{char: '-'}]
           }
         }
@@ -486,7 +493,7 @@ describe Parser do
         expect(subject.parse("%{lr-}")).to be == {
           macro: {
             letter: 'l', 
-            transformers: {reverse: 'r'},
+            reverse: 'r',
             delimiters: [{char: '-'}]
           }
         }
@@ -496,7 +503,8 @@ describe Parser do
         expect(subject.parse("%{l1r-}")).to be == {
           macro: {
             letter: 'l', 
-            transformers: {digits: '1', reverse: 'r'},
+            digits: '1',
+            reverse: 'r',
             delimiters: [{char: '-'}]
           }
         }
