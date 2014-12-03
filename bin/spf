@@ -1,28 +1,26 @@
 #!/usr/bin/env ruby
 
+lib_dir = File.expand_path('../../lib',__FILE__)
+$LOAD_PATH.unshift(lib_dir) unless $LOAD_PATH.include?(lib_dir)
+
 require 'spf_parse'
-require 'resolv'
 
 unless ARGV[0]
   puts "Please supply at least one host name"
   exit
 end
 
-resolver = Resolv::DNS.new
 ARGV.each do |arg|
-
   puts "____________________________\n"
   puts "SPF record search for #{arg}"
-  begin
-    spf = SPFParse.check_host(arg, resolver)
-  rescue
-    puts "  -error: could not process input :#{arg}"
-    puts "____________________________\n\n"
-    next
-  end
-  
-  if spf
-    puts "  - found SPF record for #{arg} at #{spf[:record_path]}:\n  #{spf[:record]}"
+
+  if (spf = SPFParse::Record.query(arg))
+    puts "  - found SPF record for #{arg}"
+    puts "    v=#{spf.version}"
+
+    spf.each do |rule|
+      puts "    #{rule}"
+    end
   else
     puts "  - no SPF record found for #{arg}"
   end
