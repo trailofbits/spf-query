@@ -96,6 +96,15 @@ module SPF
         "v=#{@version} #{@rules.join(' ')}"
       end
 
+      #
+      # Inspects the record.
+      #
+      # @return [String]
+      #
+      def inspect
+        "#<#{self.class}: #{self}>"
+      end
+
     end
   end
 end
