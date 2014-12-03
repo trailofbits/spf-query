@@ -221,7 +221,7 @@ module SPFParse
       rule(char: simple(:c)) { c }
       rule(literal: simple(:text)) { text }
       rule(macro: subtree(:options)) do
-        letter = options.fetch(:letter)
+        letter = options.fetch(:letter).to_sym
 
         Macro.new(letter,options)
       end
@@ -229,19 +229,21 @@ module SPFParse
       rule(macro_string: [simple(:text)])     { text }
       rule(macro_string: sequence(:elements)) { MacroString.new(elements) }
 
+      rule(modifier: {name: simple(:name)}) do
+        Modifier.new(name.to_sym,true)
+      end
+
+      rule(modifier: {name: simple(:name), value: subtree(:value)}) do
+        Modifier.new(name.to_sym,value)
+      end
+
       rule(unknown_modifier: {name: simple(:name), value: simple(:value)}) do
         UnknownModifier.new(name,value)
       end
 
-      rule(modifier: subtree(:options)) do
-        name = options.fetch(:name).to_sym
-        value = options.fetch(:value,true)
-
-        Modifier.new(name,value)
-      end
-
       rule(directive: subtree(:options)) do
         name      = options.delete(:name).to_sym
+        value     = options.fetch(:value,true)
         qualifier = case options[:qualifier]
                     when '+' then :pass
                     when '-' then :fail
@@ -249,7 +251,7 @@ module SPFParse
                     when '?' then :neutral
                     end
 
-        Directive.new(name,options)
+        Directive.new(name, value: value, qualifier: qualifier)
       end
 
       rule(version: simple(:version), rules: subtree(:rules)) do
