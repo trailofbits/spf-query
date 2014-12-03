@@ -11,6 +11,7 @@ module SPFParse
     #
     # @return [:spf1]
     attr_reader :version
+    alias v version
 
     # The SPF rules.
     #
@@ -28,7 +29,7 @@ module SPFParse
     #
     def initialize(version,rules=[])
       @version = version
-      @rules = rules
+      @rules   = rules
     end
 
     #
@@ -67,6 +68,22 @@ module SPFParse
       end
 
       return nil
+    end
+
+    #
+    # Enumerates over the rules.
+    #
+    # @yield [rule]
+    #   The given block will be passed each rule.
+    #
+    # @yieldparam [Directive, Modifier] rule
+    #   A directive or modifier rule.
+    #
+    # @return [Enumerator]
+    #   If no block is given, an Enumerator will be returned.
+    #
+    def each(&block)
+      @rules.each(&block)
     end
 
   end
