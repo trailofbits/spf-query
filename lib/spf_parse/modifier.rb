@@ -5,8 +5,14 @@ module SPFParse
 
     attr_reader :value
 
-    def initialize(name,value)
+    def initialize(name,value=nil)
       @name, @value = name, value
+    end
+
+    def to_s
+      if @value then "#{@name}=#{@value}"
+      else           "#{@name}"
+      end
     end
 
   end

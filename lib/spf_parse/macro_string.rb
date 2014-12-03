@@ -15,5 +15,9 @@ module SPFParse
       @elements[*arguments]
     end
 
+    def to_s
+      @elements.join
+    end
+
   end
 end

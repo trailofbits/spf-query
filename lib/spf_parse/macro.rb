@@ -18,5 +18,9 @@ module SPFParse
       @reverse
     end
 
+    def to_s
+      "%{#{@letter}#{@digits}#{@delimiters.join}}"
+    end
+
   end
 end
