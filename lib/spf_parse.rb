@@ -1,3 +1,4 @@
+require "spf_parse/record"
 require "spf_parse/version"
 require 'resolv'
 
