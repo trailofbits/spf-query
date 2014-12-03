@@ -13,7 +13,7 @@ module SPF
 
       def to_s
         if @cidr_length then "#{@address}/#{@cidr_length}"
-        else                 @address
+        else                 "#{@address}"
         end
       end
 

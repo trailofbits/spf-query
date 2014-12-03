@@ -87,6 +87,15 @@ module SPF
         @rules.each(&block)
       end
 
+      #
+      # Converts the record back to a String.
+      #
+      # @return [String]
+      #
+      def to_s
+        "v=#{@version} #{@rules.join(' ')}"
+      end
+
     end
   end
 end
