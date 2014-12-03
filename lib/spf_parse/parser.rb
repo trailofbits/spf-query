@@ -230,7 +230,7 @@ module SPFParse
       rule(macro_string: sequence(:elements)) { MacroString.new(elements) }
 
       rule(modifier: {name: simple(:name)}) do
-        Modifier.new(name.to_sym,true)
+        Modifier.new(name.to_sym)
       end
 
       rule(modifier: {name: simple(:name), value: subtree(:value)}) do
