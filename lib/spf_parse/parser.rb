@@ -243,7 +243,7 @@ module SPFParse
 
       rule(directive: subtree(:options)) do
         name      = options.delete(:name).to_sym
-        value     = options.fetch(:value,true)
+        value     = options[:value]
         qualifier = case options[:qualifier]
                     when '+' then :pass
                     when '-' then :fail
