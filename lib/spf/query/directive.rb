@@ -6,7 +6,8 @@ module SPF
         '+' => :pass,
         '-' => :fail,
         '~' => :soft_fail,
-        '?' => :neuatral
+        '?' => :neuatral,
+        nil => '+'
       }
 
       attr_reader :name, :value, :qualifier
