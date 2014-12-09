@@ -122,6 +122,40 @@ module SPF
       end
 
       #
+      # Enumerates over each `include:` mechanism.
+      #
+      def each_include
+        return enum_for(__method__) unless block_given?
+
+        each_mechanism do |mechanism|
+          if mechanism.name == :include
+            yield modifier
+          end
+        end
+      end
+
+      #
+      # @return [Enumerator]
+      #
+      # @see #each_include
+      #
+      def includes
+        each_include
+      end
+
+      #
+      # Finds the `all` mechanism.
+      #
+      # @return [Mechanism, nil]
+      #   The `all` mechanism or `nil` if none exists.
+      #
+      def all
+        mechanisms.reverse_each.find do |mechanism|
+          mechanism.name == :all
+        end
+      end
+
+      #
       # Enumerates over only the modifiers.
       #
       # @yield [modifier]
