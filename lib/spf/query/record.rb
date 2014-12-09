@@ -91,6 +91,68 @@ module SPF
       end
 
       #
+      # Enumerates over only the mechanisms.
+      #
+      # @yield [mechanism]
+      #   The given block will be passed each mechanism.
+      #
+      # @yieldparam [Mechanism] mechanism
+      #   A mechanism within the record.
+      #
+      # @return [Enumerator]
+      #   If no block was given, an Enumerator will be returned.
+      #
+      def each_mechanism
+        return enum_for(__method__) unless block_given?
+
+        each do |term|
+          case term
+          when Mechanism then yield term
+          end
+        end
+      end
+
+      #
+      # @return [Enumerator]
+      #
+      # @see #each_mechanism
+      #
+      def mechanisms
+        each_mechanism
+      end
+
+      #
+      # Enumerates over only the modifiers.
+      #
+      # @yield [modifier]
+      #   The given block will be passed each modifier.
+      #
+      # @yieldparam [Modifier] modifier
+      #   A mechanism within the record.
+      #
+      # @return [Enumerator]
+      #   If no block was given, an Enumerator will be returned.
+      #
+      def each_modifier
+        return enum_for(__method__) unless block_given?
+
+        each do |term|
+          case term
+          when Modifier then yield term
+          end
+        end
+      end
+
+      #
+      # @return [Enumerator]
+      #
+      # @see #each_modifier
+      #
+      def modifiers
+        each_modifier
+      end
+
+      #
       # Converts the record back to a String.
       #
       # @return [String]
