@@ -2,7 +2,7 @@ require 'spf/query/ip'
 require 'spf/query/macro'
 require 'spf/query/macro_string'
 require 'spf/query/modifier'
-require 'spf/query/directive'
+require 'spf/query/mechanism'
 require 'spf/query/record'
 
 require 'parslet'
@@ -245,9 +245,9 @@ module SPF
         rule(directive: subtree(:options)) do
           name      = options.delete(:name).to_sym
           value     = options[:value]
-          qualifier = Directive::QUALIFIERS[options[:qualifier]]
+          qualifier = Mechanism::QUALIFIERS[options[:qualifier]]
 
-          Directive.new(name, value: value, qualifier: qualifier)
+          Mechanism.new(name, value: value, qualifier: qualifier)
         end
 
         rule(version: simple(:version), rules: subtree(:rules)) do

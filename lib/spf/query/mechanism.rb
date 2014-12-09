@@ -1,6 +1,6 @@
 module SPF
   module Query
-    class Directive
+    class Mechanism
 
       QUALIFIERS = {
         '+' => :pass,

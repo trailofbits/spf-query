@@ -16,7 +16,7 @@ module SPF
 
       # The SPF rules.
       #
-      # @return [Array<Directive, Modifier>]
+      # @return [Array<Mechanism, Modifier>]
       attr_reader :rules
 
       #
@@ -25,7 +25,7 @@ module SPF
       # @param [:spf1] version
       #   The SPF version.
       #
-      # @param [Array<Directive, Modifier>] rules
+      # @param [Array<Mechanism, Modifier>] rules
       #   SPF rules.
       #
       def initialize(version,rules=[])
@@ -80,7 +80,7 @@ module SPF
       # @yield [rule]
       #   The given block will be passed each rule.
       #
-      # @yieldparam [Directive, Modifier] rule
+      # @yieldparam [Mechanism, Modifier] rule
       #   A directive or modifier rule.
       #
       # @return [Enumerator]
