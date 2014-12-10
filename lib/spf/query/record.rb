@@ -14,10 +14,67 @@ module SPF
       attr_reader :version
       alias v version
 
+      # All mechanisms within the record.
+      #
+      # @return [Array<Mechanism>]
+      attr_reader :mechanisms
+
+      # All modifiers within the record.
+      #
+      # @return [Array<Modifier>]
+      attr_reader :modifiers
+
       # The SPF rules.
       #
       # @return [Array<Mechanism, Modifier>]
       attr_reader :rules
+
+      attr_reader :all
+
+      # Selects all `include:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      attr_reader :include
+
+      # Selects all `a:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      attr_reader :a
+
+      # Selects all `mx:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      attr_reader :mx
+
+      # Selects all `ptr:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      attr_reader :ptr
+
+      # Selects all `ip4:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      attr_reader :ip4
+
+      # Selects all `ip6:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      attr_reader :ip6
+
+      # Selects all `exists:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      attr_reader :exists
+
+      # The `redirect=` modifier.
+      #
+      # @return [Modifier, nil]
+      attr_reader :redirect
+
+      # The `exp=` modifier.
+      #
+      # @return [Modifier, nil]
+      attr_reader :exp
 
       #
       # Initializes the SPF record.
@@ -31,6 +88,33 @@ module SPF
       def initialize(version,rules=[])
         @version = version
         @rules   = rules
+
+        @mechanisms = @rules.select { |term| term.kind_of?(Mechanism) }
+        @modifiers  = @rules.select { |term| term.kind_of?(Modifier)  }
+
+        # prefer the last `all:` mechanism
+        @all = @mechanisms.reverse_each.find do |mechanism|
+          mechanism.name == :all
+        end
+
+        mechanisms_by_name = lambda { |name|
+          @mechanisms.select { |mechanism| mechanism.name == name }
+        }
+
+        @include = mechanisms_by_name[:include]
+        @a       = mechanisms_by_name[:a]
+        @mx      = mechanisms_by_name[:mx]
+        @ptr     = mechanisms_by_name[:ptr]
+        @ip4     = mechanisms_by_name[:ip4]
+        @ip6     = mechanisms_by_name[:ip6]
+        @exists  = mechanisms_by_name[:exists]
+
+        modifier_by_name = lambda { |name|
+          @modifiers.find { |modifier| modifier.name == name }
+        }
+
+        @redirect = modifier_by_name[:redirect]
+        @exp      = modifier_by_name[:exp]
       end
 
       #
@@ -88,161 +172,6 @@ module SPF
       #
       def each(&block)
         @rules.each(&block)
-      end
-
-      #
-      # Enumerates over only the mechanisms.
-      #
-      # @yield [mechanism]
-      #   The given block will be passed each mechanism.
-      #
-      # @yieldparam [Mechanism] mechanism
-      #   A mechanism within the record.
-      #
-      # @return [Enumerator]
-      #   If no block was given, an Enumerator will be returned.
-      #
-      def each_mechanism
-        return enum_for(__method__) unless block_given?
-
-        each do |term|
-          case term
-          when Mechanism then yield term
-          end
-        end
-      end
-
-      #
-      # @return [Enumerator]
-      #
-      # @see #each_mechanism
-      #
-      def mechanisms
-        each_mechanism
-      end
-
-      #
-      # Finds the `all` mechanism.
-      #
-      # @return [Mechanism, nil]
-      #   The `all` mechanism or `nil` if none exists.
-      #
-      def all
-        mechanisms.reverse_each.find do |mechanism|
-          mechanism.name == :all
-        end
-      end
-
-      #
-      # Selects all `include:` mechanisms.
-      #
-      # @return [Array<Mechanism>]
-      #
-      def include
-        mechanism.select { |mechanism| mechanism.name == :include }
-      end
-
-      #
-      # Selects all `a:` mechanisms.
-      #
-      # @return [Array<Mechanism>]
-      #
-      def a
-        mechanism.select { |mechanism| mechanism.name == :a }
-      end
-
-      #
-      # Selects all `mx:` mechanisms.
-      #
-      # @return [Array<Mechanism>]
-      #
-      def mx
-        mechanism.select { |mechanism| mechanism.name == :mx }
-      end
-
-      #
-      # Selects all `ptr:` mechanisms.
-      #
-      # @return [Array<Mechanism>]
-      #
-      def ptr
-        mechanism.select { |mechanism| mechanism.name == :ptr }
-      end
-
-      #
-      # Selects all `ip4:` mechanisms.
-      #
-      # @return [Array<Mechanism>]
-      #
-      def ip4
-        mechanism.select { |mechanism| mechanism.name == :ip4 }
-      end
-
-      #
-      # Selects all `ip6:` mechanisms.
-      #
-      # @return [Array<Mechanism>]
-      #
-      def ip6
-        mechanism.select { |mechanism| mechanism.name == :ip6 }
-      end
-
-      #
-      # Selects all `exists:` mechanisms.
-      #
-      # @return [Array<Mechanism>]
-      #
-      def exists
-        mechanism.select { |mechanism| mechanism.name == :exists }
-      end
-
-      #
-      # Enumerates over only the modifiers.
-      #
-      # @yield [modifier]
-      #   The given block will be passed each modifier.
-      #
-      # @yieldparam [Modifier] modifier
-      #   A mechanism within the record.
-      #
-      # @return [Enumerator]
-      #   If no block was given, an Enumerator will be returned.
-      #
-      def each_modifier
-        return enum_for(__method__) unless block_given?
-
-        each do |term|
-          case term
-          when Modifier then yield term
-          end
-        end
-      end
-
-      #
-      # @return [Enumerator]
-      #
-      # @see #each_modifier
-      #
-      def modifiers
-        each_modifier
-      end
-
-      #
-      # Selects all `redirect=` modifiers.
-      #
-      # @return [Array<Modifier>]
-      #
-      def redirect
-        modifiers.select { |modifier| modifier.name == :redirect }
-      end
-
-      #
-      # Selects all `redirect=` modifiers.
-      #
-      # @return [Array<Modifier>]
-      #
-      def exp
-        modifiers.select { |modifier| modifier.name == :explanation }
       end
 
       #
