@@ -14,6 +14,11 @@ module SPF
       attr_reader :version
       alias v version
 
+      # The SPF rules.
+      #
+      # @return [Array<Mechanism, Modifier>]
+      attr_reader :rules
+
       # All mechanisms within the record.
       #
       # @return [Array<Mechanism>]
@@ -24,11 +29,9 @@ module SPF
       # @return [Array<Modifier>]
       attr_reader :modifiers
 
-      # The SPF rules.
+      # The right-most `all:` mechanism.
       #
-      # @return [Array<Mechanism, Modifier>]
-      attr_reader :rules
-
+      # @return [Mechanism, nil]
       attr_reader :all
 
       # Selects all `include:` mechanisms.
