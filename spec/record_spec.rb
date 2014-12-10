@@ -10,7 +10,29 @@ describe SPF::Query::Record do
 
   describe "#initialize" do
     let(:version) { :spf1 }
-    let(:rules)   { double(:rules) }
+
+    let(:ip4) do
+      [
+        Mechanism.new(:ip4, value: IP.new('199.16.156.0', 22)),
+        Mechanism.new(:ip4, value: IP.new('199.59.148.0', 22)),
+        Mechanism.new(:ip4, value: IP.new('8.25.194.0',   23)),
+        Mechanism.new(:ip4, value: IP.new('8.25.196.0',   23)),
+        Mechanism.new(:ip4, value: IP.new('204.92.114.203')),
+        Mechanism.new(:ip4, value: IP.new('204.92.114.204', 31)),
+        Mechanism.new(:ip4, value: IP.new('107.20.52.15')),
+        Mechanism.new(:ip4, value: IP.new('23.21.83.90')),
+      ]
+    end
+
+    let(:include) do
+      [
+        Mechanism.new(:include, value: '_spf.google.com'),
+        Mechanism.new(:include, value: '_thirdparty.twitter.com'),
+      ]
+    end
+
+    let(:all) { Mechanism.new(:all) }
+    let(:rules) { ip4 + include + [all] }
 
     subject { described_class.new(version,rules) }
 
@@ -20,6 +42,112 @@ describe SPF::Query::Record do
 
     it "should set rules" do
       expect(subject.rules).to be rules
+    end
+
+    describe "#mechanisms" do
+      subject { super().mechanisms }
+
+      it "should contain every Mechanism object" do
+        expect(subject).to all(be_a(Mechanism))
+      end
+    end
+
+    describe "#modifiers" do
+      pending "need to add modifiers"
+    end
+
+    describe "#all" do
+      subject { super().all }
+
+      it "should find the last all mechanism" do
+        expect(subject).to be all
+      end
+    end
+
+    describe "#include" do
+      subject { super().include }
+
+      it "should find all include: mechanisms" do
+        expect(subject).to be == include
+      end
+    end
+
+    describe "#a" do
+      subject { super().a }
+
+      pending "need to add a: mechanisms" do
+        it "should find all a: mechanisms" do
+          expect(subject).to be == a
+        end
+      end
+    end
+
+    describe "#mx" do
+      subject { super().mx }
+
+      pending "need to add mx: mechanisms" do
+        it "should find all mx: mechanisms" do
+          expect(subject).to be == mx
+        end
+      end
+    end
+
+    describe "#ptr" do
+      subject { super().ptr }
+
+      pending "need to add ptr: mechanisms" do
+        it "should find all ptr: mechanisms" do
+          expect(subject).to be == ptr
+        end
+      end
+    end
+
+    describe "#ip4" do
+      subject { super().ip4 }
+
+      it "should find all ip4: mechanisms" do
+        expect(subject).to be == ip4
+      end
+    end
+
+    describe "#ip6" do
+      subject { super().ptr }
+
+      pending "need to add ip6: mechanisms" do
+        it "should find all ip6: mechanisms" do
+          expect(subject).to be == ip6
+        end
+      end
+    end
+
+    describe "#exists" do
+      subject { super().exists }
+
+      pending "need to add exists: mechanisms" do
+        it "should find all exists: mechanisms" do
+          expect(subject).to be == exists
+        end
+      end
+    end
+
+    describe "#redirect" do
+      subject { super().exists }
+
+      pending "need to add a redirect: modifier" do
+        it "should find the first redirect: modifier" do
+          expect(subject).to be == redirect
+        end
+      end
+    end
+
+    describe "#exp" do
+      subject { super().exp }
+
+      pending "need to add a exp: modifier" do
+        it "should find the first exp: modifier" do
+          expect(subject).to be == exp
+        end
+      end
     end
   end
 
