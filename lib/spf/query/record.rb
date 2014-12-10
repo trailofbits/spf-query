@@ -122,28 +122,6 @@ module SPF
       end
 
       #
-      # Enumerates over each `include:` mechanism.
-      #
-      def each_include
-        return enum_for(__method__) unless block_given?
-
-        each_mechanism do |mechanism|
-          if mechanism.name == :include
-            yield modifier
-          end
-        end
-      end
-
-      #
-      # @return [Enumerator]
-      #
-      # @see #each_include
-      #
-      def includes
-        each_include
-      end
-
-      #
       # Finds the `all` mechanism.
       #
       # @return [Mechanism, nil]
@@ -153,6 +131,69 @@ module SPF
         mechanisms.reverse_each.find do |mechanism|
           mechanism.name == :all
         end
+      end
+
+      #
+      # Selects all `include:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      #
+      def include
+        mechanism.select { |mechanism| mechanism.name == :include }
+      end
+
+      #
+      # Selects all `a:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      #
+      def a
+        mechanism.select { |mechanism| mechanism.name == :a }
+      end
+
+      #
+      # Selects all `mx:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      #
+      def mx
+        mechanism.select { |mechanism| mechanism.name == :mx }
+      end
+
+      #
+      # Selects all `ptr:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      #
+      def ptr
+        mechanism.select { |mechanism| mechanism.name == :ptr }
+      end
+
+      #
+      # Selects all `ip4:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      #
+      def ip4
+        mechanism.select { |mechanism| mechanism.name == :ip4 }
+      end
+
+      #
+      # Selects all `ip6:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      #
+      def ip6
+        mechanism.select { |mechanism| mechanism.name == :ip6 }
+      end
+
+      #
+      # Selects all `exists:` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      #
+      def exists
+        mechanism.select { |mechanism| mechanism.name == :exists }
       end
 
       #
@@ -184,6 +225,24 @@ module SPF
       #
       def modifiers
         each_modifier
+      end
+
+      #
+      # Selects all `redirect=` modifiers.
+      #
+      # @return [Array<Modifier>]
+      #
+      def redirect
+        modifiers.select { |modifier| modifier.name == :redirect }
+      end
+
+      #
+      # Selects all `redirect=` modifiers.
+      #
+      # @return [Array<Modifier>]
+      #
+      def exp
+        modifiers.select { |modifier| modifier.name == :explanation }
       end
 
       #
