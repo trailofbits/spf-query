@@ -7,7 +7,3 @@ require 'rspec'
 require 'spf/query'
 
 include SPF::Query
-
-RSpec.configure do |specs|
-  specs
-end
