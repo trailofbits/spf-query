@@ -1,4 +1,5 @@
 require 'spf/query/parser'
+require 'spf/query/query'
 
 require 'resolv'
 
@@ -147,18 +148,9 @@ module SPF
       # @api public
       #
       def self.query(domain,resolver=Resolv::DNS.new)
-        [domain, "_spf.#{domain}"].each do |host|
-          begin
-            spf = resolver.getresource(host, Resolv::DNS::Resource::IN::TXT).strings.join
-
-            if spf.include?('v=spf1')
-              return parse(spf)
-            end
-          rescue Resolv::ResolvError
-          end
+        if (spf = Query.query(domain,resolver))
+          parse(spf)
         end
-
-        return nil
       end
 
       #
