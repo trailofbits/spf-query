@@ -11,7 +11,7 @@ describe SPF::Query::Record do
   describe "#initialize" do
     let(:version) { :spf1 }
 
-    let(:ip4) do
+    let(:ip4_rules) do
       [
         Mechanism.new(:ip4, value: IP.new('199.16.156.0', 22)),
         Mechanism.new(:ip4, value: IP.new('199.59.148.0', 22)),
@@ -24,15 +24,15 @@ describe SPF::Query::Record do
       ]
     end
 
-    let(:include) do
+    let(:include_rules) do
       [
         Mechanism.new(:include, value: '_spf.google.com'),
         Mechanism.new(:include, value: '_thirdparty.twitter.com'),
       ]
     end
 
-    let(:all) { Mechanism.new(:all) }
-    let(:rules) { ip4 + include + [all] }
+    let(:all_rule) { Mechanism.new(:all) }
+    let(:rules) { ip4_rules + include_rules + [all_rule] }
 
     subject { described_class.new(version,rules) }
 
@@ -60,7 +60,7 @@ describe SPF::Query::Record do
       subject { super().all }
 
       it "should find the last all mechanism" do
-        expect(subject).to be all
+        expect(subject).to be all_rule
       end
     end
 
@@ -68,7 +68,7 @@ describe SPF::Query::Record do
       subject { super().include }
 
       it "should find all include: mechanisms" do
-        expect(subject).to be == include
+        expect(subject).to be == include_rules
       end
     end
 
@@ -106,7 +106,7 @@ describe SPF::Query::Record do
       subject { super().ip4 }
 
       it "should find all ip4: mechanisms" do
-        expect(subject).to be == ip4
+        expect(subject).to be == ip4_rules
       end
     end
 
