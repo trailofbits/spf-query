@@ -21,13 +21,13 @@ module SPF
 
       rule(:mechanism) do
         all     |
-          include |
-          a       |
-          mx      |
-          ptr     |
-          ip4     |
-          ip6     |
-          exists
+        include |
+        a       |
+        mx      |
+        ptr     |
+        ip4     |
+        ip6     |
+        exists
       end
 
       rule(:all) { str('all').as(:name) }
