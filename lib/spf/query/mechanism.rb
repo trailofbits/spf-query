@@ -10,11 +10,16 @@ module SPF
         nil => '+'
       }
 
-      attr_reader :name, :value, :qualifier
+      attr_reader :name
+      
+      attr_reader :value
+      
+      attr_reader :qualifier
 
       def initialize(name,options={})
         @name = name
-        @value = options[:value]
+
+        @value     = options[:value]
         @qualifier = options[:qualifier]
       end
 

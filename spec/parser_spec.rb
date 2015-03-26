@@ -575,6 +575,11 @@ describe Parser do
   end
 
   describe Parser::Transform do
+    describe "qualifier" do
+      it "should map qualifiers to Symbol names" do
+        expect(subject.apply(qualifier: '~')).to be :soft_fail
+      end
+    end
   end
 
   describe ".parse" do
