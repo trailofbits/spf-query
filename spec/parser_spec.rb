@@ -575,9 +575,21 @@ describe Parser do
   end
 
   describe Parser::Transform do
-    describe "qualifier" do
-      it "should map qualifiers to Symbol names" do
-        expect(subject.apply(qualifier: '~')).to be :soft_fail
+    describe "directive" do
+      subject do
+        super().apply(directive: {qualifier: '~', name: 'all'})
+      end
+
+      it "should map directives to Mechanism objects" do
+        expect(subject).to be_kind_of(Mechanism)
+      end
+
+      it "should set the name" do
+        expect(subject.name).to be == :all
+      end
+
+      it "should map qualifier to a Symbol" do
+        expect(subject.qualifier).to be :soft_fail
       end
     end
   end

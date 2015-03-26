@@ -242,13 +242,12 @@ module SPF
           UnknownModifier.new(name,value)
         end
 
-        rule(qualifier: simple(:qualifier)) do
-          Mechanism::QUALIFIERS.fetch(qualifier.to_s)
-        end
         rule(directive: subtree(:options)) do
           name      = options.delete(:name).to_sym
           value     = options[:value]
-          qualifier = options[:qualifier]
+          qualifier = if options[:qualifier]
+                        Mechanism::QUALIFIERS.fetch(options[:qualifier].to_s)
+                      end
 
           Mechanism.new(name, value: value, qualifier: qualifier)
         end
