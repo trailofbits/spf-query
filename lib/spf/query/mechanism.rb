@@ -22,6 +22,22 @@ module SPF
         @qualifier = options.fetch(:qualifier,:pass)
       end
 
+      def pass?
+        @qualifier == :pass
+      end
+
+      def fail?
+        @qualifier == :fail
+      end
+
+      def soft_fail?
+        @qualifier == :soft_fail
+      end
+
+      def neutral?
+        @qualifier == :neutral
+      end
+
       def to_s
         str = "#{QUALIFIERS.invert[@qualifier]}#{@name}"
         str << ":#{@value}" if value
