@@ -13,13 +13,11 @@ module SPF
       
       attr_reader :value
       
-      attr_reader :qualifier
-
       def initialize(name,options={})
         @name = name
 
         @value     = options[:value]
-        @qualifier = options[:qualifier]
+        @qualifier = options.fetch(:qualifier,:pass)
       end
 
       def to_s
