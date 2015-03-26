@@ -12,6 +12,8 @@ module SPF
       attr_reader :name
       
       attr_reader :value
+
+      attr_reader :qualifier
       
       def initialize(name,options={})
         @name = name
