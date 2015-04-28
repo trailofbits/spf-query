@@ -1,3 +1,4 @@
+require 'spf/query/exceptions'
 require 'spf/query/parser'
 require 'spf/query/query'
 
@@ -124,12 +125,23 @@ module SPF
       #
       # Parses an SPF record.
       #
+      # @param [String] spf
+      #   The raw SPF record.
+      #
+      # @return [Record]
+      #   The parsed SPF record.
+      #
+      # @raise [InvalidRecord]
+      #   The SPF record could not be parsed.
+      #
       # @see Parser.parse
       #
       # @api public
       #
       def self.parse(spf)
         Parser.parse(spf)
+      rescue Parslet::ParseFailed => error
+        raise(InvalidRecord.new(error.message,error.cause))
       end
 
       #
