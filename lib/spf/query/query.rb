@@ -19,10 +19,12 @@ module SPF
     def self.query(domain,resolver=Resolv::DNS.new)
       [domain, "_spf.#{domain}"].each do |host|
         begin
-          spf = resolver.getresource(host, Resolv::DNS::Resource::IN::TXT).strings.join
-
-          if spf.include?('v=spf1')
-            return spf
+          records = resolver.getresources(host, Resolv::DNS::Resource::IN::TXT)
+          records.each do |record|
+            record_to_s = record.strings.join
+            if record_to_s.include?('v=spf1')
+              return record_to_s
+            end
           end
         rescue Resolv::ResolvError
         end
