@@ -17,7 +17,7 @@ module SPF
     # @api semipublic
     #
     def self.query(domain,resolver=Resolv::DNS.new)
-      [domain, "_spf.#{domain}"].each do |host|
+      ["_spf.#{domain}", domain].each do |host|
         begin
           records = resolver.getresources(host, Resolv::DNS::Resource::IN::TXT)
 
