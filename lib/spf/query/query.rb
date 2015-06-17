@@ -20,10 +20,12 @@ module SPF
       [domain, "_spf.#{domain}"].each do |host|
         begin
           records = resolver.getresources(host, Resolv::DNS::Resource::IN::TXT)
+
           records.each do |record|
-            record_to_s = record.strings.join
-            if record_to_s.include?('v=spf1')
-              return record_to_s
+            txt = record.strings.join
+
+            if txt.include?('v=spf1')
+              return txt
             end
           end
         rescue Resolv::ResolvError
