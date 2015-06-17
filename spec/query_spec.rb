@@ -8,7 +8,7 @@ describe SPF::Query do
     let(:domain) { 'google.com' }
 
     it "should return the SPF record" do
-      expect(subject.query(domain)).to be == 'v=spf1 include:_spf.google.com ip4:216.73.93.70/31 ip4:216.73.93.72/31 ~all'
+      expect(subject.query(domain)).to be == %{v=spf1 include:_netblocks.google.com include:_netblocks2.google.com include:_netblocks3.google.com ~all}
     end
 
     context "when given an invalid domain" do
