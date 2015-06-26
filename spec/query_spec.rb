@@ -5,10 +5,18 @@ describe SPF::Query do
   subject { described_class }
 
   describe ".query" do
-    let(:domain) { 'google.com' }
+    let(:domain) { 'gmail.com' }
 
-    it "should return the SPF record" do
-      expect(subject.query(domain)).to be == %{v=spf1 include:_netblocks.google.com include:_netblocks2.google.com include:_netblocks3.google.com ~all}
+    it "should return the first SPF record" do
+      expect(subject.query(domain)).to be == %{v=spf1 redirect=_spf.google.com}
+    end
+
+    context "when _spf.domain.com exists" do
+      let(:domain) { 'google.com' }
+
+      it "should return the first SPF record" do
+        expect(subject.query(domain)).to be == %{v=spf1 include:_netblocks.google.com include:_netblocks2.google.com include:_netblocks3.google.com ~all}
+      end
     end
 
     context "when given an invalid domain" do
