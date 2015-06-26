@@ -1,4 +1,5 @@
 require 'resolv'
+require 'resolv/dns/resource/in/spf'
 
 module SPF
   module Query
@@ -17,6 +18,15 @@ module SPF
     # @api semipublic
     #
     def self.query(domain,resolver=Resolv::DNS.new)
+      # check for an SPF record on the domain
+      begin
+        record = resolver.getresource(domain, Resolv::DNS::Resource::IN::SPF)
+
+        return record.strings.join
+      rescue Resolv::ResolvError
+      end
+
+      # check for SPF in the TXT records
       ["_spf.#{domain}", domain].each do |host|
         begin
           records = resolver.getresources(host, Resolv::DNS::Resource::IN::TXT)
