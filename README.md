@@ -4,7 +4,9 @@
 [![Test Coverage](https://codeclimate.com/github/trailofbits/spf-query/badges/coverage.svg)](https://codeclimate.com/github/trailofbits/spf-query)
 [![Build Status](https://travis-ci.org/trailofbits/spf-query.svg)](https://travis-ci.org/trailofbits/spf-query)
 
-The `spf-query` library searches the spf records for a host. We assume the host uses standard spf 'selectors', and also check if they use their own 'selector'.
+The `spf-query` library searches the [SPF] records for a host. We assume the
+host uses standard spf 'selectors', and also check if they use their own
+'selector'.
 
 ## Examples
 
@@ -63,3 +65,4 @@ Query multiple domains:
 See the {file:LICENSE.txt} file.
 
 [parslet]: http://kschiess.github.io/parslet/
+[SPF]: https://tools.ietf.org/html/rfc7208
