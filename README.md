@@ -59,6 +59,7 @@ Query multiple domains:
 
 ## Requirements
 
+* [ruby] >= 1.9.1
 * [parslet] ~> 1.0
 
 ## Install
@@ -69,5 +70,6 @@ Query multiple domains:
 
 See the {file:LICENSE.txt} file.
 
+[ruby]: https://www.ruby-lang.org/
 [parslet]: http://kschiess.github.io/parslet/
 [SPF]: https://tools.ietf.org/html/rfc7208
