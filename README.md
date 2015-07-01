@@ -8,6 +8,11 @@ The `spf-query` library searches the [SPF] records for a host. We assume the
 host uses standard spf 'selectors', and also check if they use their own
 'selector'.
 
+## Features
+
+* Queries and parses SPF records.
+* Supports querying both TXT and SPF records.
+
 ## Examples
 
     require 'spf/query'
