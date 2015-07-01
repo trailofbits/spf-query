@@ -9,6 +9,11 @@ require 'parslet'
 
 module SPF
   module Query
+    #
+    # SPF parser.
+    #
+    # @see https://tools.ietf.org/html/rfc7208#section-7.1
+    #
     class Parser < Parslet::Parser
 
       root :record
