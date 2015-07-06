@@ -272,6 +272,8 @@ module SPF
       # @return [Record]
       #   The parsed SPF record.
       #
+      # @raise [Parslet::ParseError]
+      #
       def self.parse(spf)
         Transform.new.apply(new.parse(spf))
       end
