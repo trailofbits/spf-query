@@ -1,3 +1,8 @@
+### 0.1.1 / 2015-07-06
+
+* Raise {SPF::Query::SenderIDFound} from {SPF::Query::Record.parse} if
+  [Sender ID](http://www.openspf.org/SPF_vs_Sender_ID) is detected.
+
 ### 0.1.0 / 2015-07-01
 
 * Initial release:
