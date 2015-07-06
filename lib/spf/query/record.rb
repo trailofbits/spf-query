@@ -134,14 +134,22 @@ module SPF
       # @raise [InvalidRecord]
       #   The SPF record could not be parsed.
       #
+      # @raise [SenderIDFound]
+      #
       # @see Parser.parse
       #
       # @api public
       #
       def self.parse(spf)
-        Parser.parse(spf)
-      rescue Parslet::ParseFailed => error
-        raise(InvalidRecord.new(error.message,error.cause))
+        if spf.include?('spf2.0')
+          raise(SenderIDFound,"Sender ID was found in place of SPF")
+        end
+
+        begin
+          Parser.parse(spf)
+        rescue Parslet::ParseFailed => error
+          raise(InvalidRecord.new(error.message,error.cause))
+        end
       end
 
       #

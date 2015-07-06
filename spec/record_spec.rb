@@ -173,6 +173,16 @@ describe SPF::Query::Record do
         }.to raise_error(InvalidRecord)
       end
     end
+
+    context "when given a SenderID record" do
+      let(:sender_id) { "spf2.0/mfrom,pra or spf2.0/pra,mfrom" }
+
+      it "should raise a SenderIDFound exception" do
+        expect {
+          described_class.parse(sender_id)
+        }.to raise_error(SenderIDFound)
+      end
+    end
   end
 
   describe ".query" do
