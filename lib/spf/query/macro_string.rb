@@ -16,6 +16,14 @@ module SPF
         @elements[*arguments]
       end
 
+      def to_a
+        @elements
+      end
+
+      def to_ary
+        @elements
+      end
+
       def to_s
         @elements.join
       end
