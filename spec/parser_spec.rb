@@ -598,10 +598,18 @@ describe Parser do
 
       context "containing a mix of macro_expands and literals" do
         let(:string1) { 'foo'  }
-        let(:macro)   { 's' }
+        let(:macro)   { 's'    }
         let(:string2) { 'bar'  }
 
-        subject { super().apply(macro_string: [{literal: string1}, {macro: {letter: macro}}, {literal: string2}]) }
+        subject do
+          super().apply(
+            macro_string: [
+              {literal: string1},
+              {macro: {letter: macro}},
+              {literal: string2}
+            ]
+          )
+        end
 
         it "should convert to a String" do
           expect(subject).to           be_kind_of(MacroString)
