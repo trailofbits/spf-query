@@ -23,7 +23,7 @@ describe SPF::Query do
       let(:domain) { 'getlua.com' }
 
       it "should prefer the SPF type record over other TXT records" do
-        expect(subject.query(domain)).to be == %{v=spf1 include:mail.zendesk.com include:servers.mcsv.net include:_spf.google.com include:sendgrid.net include:mktomail.com -all}
+        expect(subject.query(domain)).to be == %{v=spf1 include:_spf.google.com include:mail.zendesk.com include:servers.mcsv.net -all}
       end
     end
 
