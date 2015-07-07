@@ -575,6 +575,28 @@ describe Parser do
   end
 
   describe Parser::Transform do
+    describe "literal" do
+      let(:string) { '_spf.google.com' }
+
+      subject { super().apply(literal: string) }
+
+      it "should convert to a String" do
+        expect(subject).to be == string
+      end
+    end
+
+    describe "macro_string" do
+      context "containing a single literal string" do
+        let(:string) { '_spf.google.com' }
+
+        subject { super().apply(macro_string: [{literal: string}]) }
+
+        it "should convert to a String" do
+          expect(subject).to be == string
+        end
+      end
+    end
+
     describe "directive" do
       subject do
         super().apply(directive: {qualifier: '~', name: 'all'})

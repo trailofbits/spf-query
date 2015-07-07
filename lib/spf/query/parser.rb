@@ -232,8 +232,13 @@ module SPF
           Macro.new(letter,options)
         end
 
-        rule(macro_string: [simple(:text)])     { text }
-        rule(macro_string: sequence(:elements)) { MacroString.new(elements) }
+        rule(macro_string: sequence(:elements)) do
+          if elements.length == 1 && elements.first.kind_of?(String)
+            elements.first
+          else
+            MacroString.new(elements)
+          end
+        end
 
         rule(modifier: {name: simple(:name)}) do
           Modifier.new(name.to_sym)
