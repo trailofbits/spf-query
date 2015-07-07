@@ -595,6 +595,22 @@ describe Parser do
           expect(subject).to be == string
         end
       end
+
+      context "containing a mix of macro_expands and literals" do
+        let(:string1) { 'foo'  }
+        let(:macro)   { 's' }
+        let(:string2) { 'bar'  }
+
+        subject { super().apply(macro_string: [{literal: string1}, {macro: {letter: macro}}, {literal: string2}]) }
+
+        it "should convert to a String" do
+          expect(subject).to           be_kind_of(MacroString)
+          expect(subject[0]).to        be == string1
+          expect(subject[1]).to        be_kind_of(Macro)
+          expect(subject[1].letter).to be == macro.to_sym
+          expect(subject[2]).to        be == string2
+        end
+      end
     end
 
     describe "directive" do
