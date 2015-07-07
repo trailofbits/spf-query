@@ -1,3 +1,9 @@
+### 0.1.2 / 2015-07-07
+
+#### parser
+
+* Properly transform macro_strings that contain a single literal into a String.
+
 ### 0.1.1 / 2015-07-06
 
 * Raise {SPF::Query::SenderIDFound} from {SPF::Query::Record.parse} if
