@@ -224,8 +224,8 @@ module SPF
           IP.new(address,cidr_length.to_i)
         end
 
-        rule(char: simple(:c)) { c }
-        rule(literal: simple(:text)) { text }
+        rule(char: simple(:c)) { c.to_s }
+        rule(literal: simple(:text)) { text.to_s }
         rule(macro: subtree(:options)) do
           letter = options.fetch(:letter).to_sym
 

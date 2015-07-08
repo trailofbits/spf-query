@@ -575,12 +575,24 @@ describe Parser do
   end
 
   describe Parser::Transform do
+    describe "c" do
+      let(:char) { 'c' }
+
+      subject { super().apply(char: char) }
+
+      it "should convert to a String" do
+        expect(subject).to be_kind_of(String)
+        expect(subject).to be == char
+      end
+    end
+
     describe "literal" do
       let(:string) { '_spf.google.com' }
 
       subject { super().apply(literal: string) }
 
       it "should convert to a String" do
+        expect(subject).to be_kind_of(String)
         expect(subject).to be == string
       end
     end
