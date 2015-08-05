@@ -24,7 +24,7 @@ host uses standard spf 'selectors', and also check if they use their own
     # => #<SPF::Query::Record: v=spf1 ip4:199.16.156.0/22 ip4:199.59.148.0/22 ip4:8.25.194.0/23 ip4:8.25.196.0/23 ip4:204.92.114.203 ip4:204.92.114.204/31 ip4:107.20.52.15 ip4:23.21.83.90 include:_spf.google.com include:_thirdparty.twitter.com -all>
         
 
-## Symopsis
+## Synopsis
 
 Query a domain:
 
