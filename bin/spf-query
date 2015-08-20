@@ -14,7 +14,7 @@ ARGV.each do |arg|
   puts "____________________________\n"
   puts "SPF record search for #{arg}"
 
-  if (spf = SPFParse::Record.query(arg))
+  if (spf = SPF::Query::Record.query(arg))
     puts "  - found SPF record for #{arg}"
     puts "    v=#{spf.version}"
 
