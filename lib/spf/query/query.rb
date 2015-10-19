@@ -22,7 +22,7 @@ module SPF
       begin
         record = resolver.getresource(domain, Resolv::DNS::Resource::IN::SPF)
 
-        return record.strings.join
+        return record.strings.join(' ')
       rescue Resolv::ResolvError
       end
 
@@ -32,7 +32,7 @@ module SPF
           records = resolver.getresources(host, Resolv::DNS::Resource::IN::TXT)
 
           records.each do |record|
-            txt = record.strings.join
+            txt = record.strings.join(' ')
 
             if txt.include?('v=spf1')
               return txt
