@@ -1,3 +1,7 @@
+### 0.1.3 / 2015-10-19
+
+* Join multi-part DNS responses together with a `' '` instead of nothing.
+
 ### 0.1.2 / 2015-07-07
 
 #### parser
