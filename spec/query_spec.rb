@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'spf/query/query'
-
 describe SPF::Query do
   subject { described_class }
 
@@ -32,6 +31,15 @@ describe SPF::Query do
 
       it "should return nil" do
         expect(subject.query(domain)).to be_nil
+      end
+    end
+
+    context 'when skip spf record type check' do
+      let(:domain) { 'getlua.com' }
+
+      it "skip properly" do
+        expect_any_instance_of(Resolv::DNS).not_to receive(:get_resource).with(domain, Resolv::DNS::Resource::IN::SPF)
+        subject.query(domain)
       end
     end
   end
