@@ -22,7 +22,11 @@ describe SPF::Query do
     context "when the domain has a SPF type record" do
       let(:domain) { 'getlua.com' }
 
-      it "should prefer the SPF type record over other TXT records" do
+      it "should prefer the TXT type record over other SPF records" do
+        expect_any_instance_of(Resolv::DNS).to_not receive(:getresource).with("getlua.com", Resolv::DNS::Resource::IN::SPF)
+        expect_any_instance_of(Resolv::DNS).to receive(:getresources).with("getlua.com", Resolv::DNS::Resource::IN::TXT).at_least(:once).and_call_original
+        expect_any_instance_of(Resolv::DNS).to receive(:getresources).with("_spf.getlua.com", Resolv::DNS::Resource::IN::TXT).at_least(:once).and_call_original
+
         expect(subject.query(domain)).to be == %{v=spf1 include:_spf.google.com include:mail.zendesk.com include:servers.mcsv.net -all}
       end
     end

@@ -18,14 +18,6 @@ module SPF
     # @api semipublic
     #
     def self.query(domain,resolver=Resolv::DNS.new)
-      # check for an SPF record on the domain
-      begin
-        record = resolver.getresource(domain, Resolv::DNS::Resource::IN::SPF)
-
-        return record.strings.join(' ')
-      rescue Resolv::ResolvError
-      end
-
       # check for SPF in the TXT records
       ["_spf.#{domain}", domain].each do |host|
         begin
@@ -40,6 +32,14 @@ module SPF
           end
         rescue Resolv::ResolvError
         end
+      end
+
+      # check for an SPF record on the domain
+      begin
+        record = resolver.getresource(domain, Resolv::DNS::Resource::IN::SPF)
+
+        return record.strings.join(' ')
+      rescue Resolv::ResolvError
       end
 
       return nil
