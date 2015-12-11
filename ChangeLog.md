@@ -1,3 +1,9 @@
+### 0.1.4 / 2015-12-10
+
+* Prioritize TXT records on `_spf.example.com` and `example.com` over a SPF
+  record on `example.com`. [RFC 7208] deprecated SPF-type records.
+  (@nandosousafr)
+
 ### 0.1.3 / 2015-10-19
 
 * Join multi-part DNS responses together with a `' '` instead of nothing.
@@ -20,3 +26,4 @@
   * Queries and parses SPF records.
   * Supports querying both TXT and SPF records.
 
+[RFC 7208]: https://tools.ietf.org/html/rfc7208#section-3.1
