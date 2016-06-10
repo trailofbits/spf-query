@@ -6,6 +6,9 @@ require 'resolv'
 
 module SPF
   module Query
+    #
+    # Represents a parsed SPF record.
+    #
     class Record
 
       include Enumerable
