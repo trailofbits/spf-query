@@ -1,3 +1,11 @@
+### 0.1.5 / 2016-07-10
+
+* Fixed a bug in {SPF::Query.query} for when the TXT record is split into
+  multiple strings. According to [RFC 7208, Section 3.3]
+* Fixed a bug in {SPF::Query::Mechanism#to_s}.
+
+[RFC 7208, Section 3.3]: https://tools.ietf.org/html/rfc7208#section-3.3
+
 ### 0.1.4 / 2015-12-10
 
 * Prioritize TXT records on `_spf.example.com` and `example.com` over a SPF
