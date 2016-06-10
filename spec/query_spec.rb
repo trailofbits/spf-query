@@ -19,6 +19,14 @@ describe SPF::Query do
       end
     end
 
+    context "when the domain.com has a TXT record" do
+      let(:domain) { 'yahoo.com' }
+
+      it "should return the TXT record containing the SPF record" do
+        expect(subject.query(domain)).to be == %{v=spf1 redirect=_spf.mail.yahoo.com}
+      end
+    end
+
     context "when the domain has a SPF type record" do
       let(:domain) { 'getlua.com' }
 
