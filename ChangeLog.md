@@ -1,7 +1,8 @@
 ### 0.1.5 / 2016-07-10
 
 * Fixed a bug in {SPF::Query.query} for when the TXT record is split into
-  multiple strings. According to [RFC 7208, Section 3.3]
+  multiple strings. According to [RFC 7208, Section 3.3], multiple strings
+  should be joined together _without_ spaces.
 * Fixed a bug in {SPF::Query::Mechanism#to_s}.
 
 [RFC 7208, Section 3.3]: https://tools.ietf.org/html/rfc7208#section-3.3
