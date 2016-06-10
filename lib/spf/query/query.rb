@@ -24,7 +24,7 @@ module SPF
           records = resolver.getresources(host, Resolv::DNS::Resource::IN::TXT)
 
           records.each do |record|
-            txt = record.strings.join(' ')
+            txt = record.strings.join
 
             if txt.include?('v=spf1')
               return txt

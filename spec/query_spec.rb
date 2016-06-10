@@ -25,6 +25,14 @@ describe SPF::Query do
       it "should return the TXT record containing the SPF record" do
         expect(subject.query(domain)).to be == %{v=spf1 redirect=_spf.mail.yahoo.com}
       end
+
+      context "and when the record is split into multiple strings" do
+        let(:domain) { 'fb.com' }
+
+        it "should join the strings, without spaces" do
+          expect(subject.query(domain)).to be == %{v=spf1 ip4:69.171.232.0/24 ip4:199.201.64.23 ip4:192.201.64.23 ip4:69.63.179.25 ip4:69.63.178.128/25 ip4:69.63.184.0/25 ip4:66.220.144.128/25 ip4:66.220.155.128/25 include:spf-00082601.pphosted.com mx -all}
+        end
+      end
     end
 
     context "when the domain has a SPF type record" do
