@@ -17,7 +17,7 @@ module SPF
       #
       # @return [Symbol]
       attr_reader :name
-      
+
       # The mechanism value.
       #
       # @return [String, MacroString, IP, nil]
@@ -41,6 +41,11 @@ module SPF
         @name = name
 
         @value     = options[:value]
+
+        if @value.is_a?(String)
+          @value = options[:value].length.zero? ? nil : options[:value]
+        end
+
         @qualifier = options[:qualifier]
       end
 
