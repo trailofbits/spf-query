@@ -27,10 +27,10 @@ describe SPF::Query do
       end
 
       context "and when the record is split into multiple strings" do
-        let(:domain) { 'fb.com' }
+        let(:domain) { '_spf.facebook.com' }
 
         it "should join the strings, without spaces" do
-          expect(subject.query(domain)).to be == %{v=spf1 ip4:69.171.232.0/24 ip4:199.201.64.23 ip4:192.201.64.23 ip4:69.63.179.25 ip4:69.63.178.128/25 ip4:69.63.184.0/25 ip4:66.220.144.128/25 ip4:66.220.155.128/25 include:spf-00082601.pphosted.com mx -all}
+          expect(subject.query(domain)).to be == %{v=spf1 ip4:69.63.179.25 ip4:69.63.178.128/25 ip4:69.63.184.0/25 ip4:66.220.144.128/25 ip4:66.220.155.0/24 ip4:69.171.232.0/24 ip4:66.220.157.0/25 ip4:69.171.244.0/24 mx -all}
         end
       end
     end
@@ -43,7 +43,7 @@ describe SPF::Query do
         expect_any_instance_of(Resolv::DNS).to receive(:getresources).with("getlua.com", Resolv::DNS::Resource::IN::TXT).at_least(:once).and_call_original
         expect_any_instance_of(Resolv::DNS).to receive(:getresources).with("_spf.getlua.com", Resolv::DNS::Resource::IN::TXT).at_least(:once).and_call_original
 
-        expect(subject.query(domain)).to be == %{v=spf1 include:_spf.google.com include:mail.zendesk.com include:servers.mcsv.net -all}
+        expect(subject.query(domain)).to be == %{v=spf1 include:_spf.google.com include:mail.zendesk.com include:servers.mcsv.net include:aspmx.pardot.com -all}
       end
     end
 
