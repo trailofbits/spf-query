@@ -1,3 +1,5 @@
+require 'ipaddr'
+
 module SPF
   module Query
     #
@@ -25,7 +27,7 @@ module SPF
       #   Optional CIDR length.
       #
       def initialize(address,cidr_length=nil)
-        @address     = address
+        @address     = address.to_s
         @cidr_length = cidr_length
       end
 
@@ -38,6 +40,19 @@ module SPF
         if @cidr_length then "#{@address}/#{@cidr_length}"
         else                 "#{@address}"
         end
+      end
+
+      #
+      # Converts the IP address into an [IPaddr] object.
+      #
+      # @return [IPAddr]
+      #
+      # [IPAddr]: http://www.rubydoc.info/stdlib/ipaddr/IPAddr
+      #
+      # @since 0.2.0
+      #
+      def to_ipaddr
+        IPAddr.new(to_s)
       end
 
     end

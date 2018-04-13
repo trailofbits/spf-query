@@ -22,4 +22,11 @@ describe SPF::Query::IP do
       end
     end
   end
+
+  describe "#to_ipaddr" do
+    it "should create a new IPAddr object" do
+      expect(subject.to_ipaddr).to be_kind_of(IPAddr)
+      expect(subject.to_ipaddr.to_s).to be == address
+    end
+  end
 end
