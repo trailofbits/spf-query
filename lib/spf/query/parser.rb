@@ -221,7 +221,7 @@ module SPF
 
         rule(ip: simple(:address)) { IP.new(address) }
         rule(ip: simple(:address), cidr_length: simple(:cidr_length)) do
-          IP.new(address,cidr_length.to_i)
+          IP.new(address.to_s,cidr_length.to_i)
         end
 
         rule(char: simple(:c)) { c.to_s }
@@ -249,7 +249,7 @@ module SPF
         end
 
         rule(unknown_modifier: {name: simple(:name), value: simple(:value)}) do
-          UnknownModifier.new(name,value)
+          UnknownModifier.new(name.to_s,value.to_s)
         end
 
         rule(directive: subtree(:options)) do
