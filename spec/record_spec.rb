@@ -115,7 +115,19 @@ describe SPF::Query::Record do
 
       pending "need to add ip6: mechanisms" do
         it "should find all ip6: mechanisms" do
-          expect(subject).to be == ip6
+          expect(subject).to be == ip6_rules
+        end
+      end
+    end
+
+    describe "#ips" do
+      it "should contain ip4 mechanisms" do
+        expect(subject.ips).to include(*subject.ip4)
+      end
+
+      pending "need to add ip6: mechanisms" do
+        it "should also contain ip6 mechanisms" do
+          expect(subject).to include(*ip6_rules)
         end
       end
     end

@@ -69,6 +69,13 @@ module SPF
       # @return [Array<Mechanism>]
       attr_reader :ip6
 
+      # The combined `ip4:` and `ip6` mechanisms.
+      #
+      # @return [Array<Mechanism>]
+      #
+      # @since 0.2.0
+      attr_reader :ips
+
       # Selects all `exists:` mechanisms.
       #
       # @return [Array<Mechanism>]
@@ -115,6 +122,7 @@ module SPF
         @ptr     = mechanisms_by_name[:ptr]
         @ip4     = mechanisms_by_name[:ip4]
         @ip6     = mechanisms_by_name[:ip6]
+        @ips     = @ip4 + @ip6
         @exists  = mechanisms_by_name[:exists]
 
         modifier_by_name = lambda { |name|
