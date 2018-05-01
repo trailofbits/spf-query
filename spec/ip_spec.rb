@@ -26,7 +26,7 @@ describe SPF::Query::IP do
   describe "#to_ipaddr" do
     it "should create a new IPAddr object" do
       expect(subject.to_ipaddr).to be_kind_of(IPAddr)
-      expect(subject.to_ipaddr.to_s).to be == address
+      expect(subject.to_ipaddr.to_s).to be == '127.0.0.0'
     end
   end
 end
