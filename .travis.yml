@@ -1,16 +1,30 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=7ea441f6db20b42bf77b3d49f149f2fd683b58d714a1a2bc148820e963c77862
+
 language: ruby
 rvm:
-- 2.1.8
-- 2.2.4
-- 2.3.0
-- jruby
-- rbx-2
+  - 2.2
+  - 2.3
+  - 2.4
+  - 2.5
+  - ruby-head
+  - jruby
 matrix:
   allow_failures:
-  - rvm: rbx-2
-addons:
-  code_climate:
-    repo_token: 7ea441f6db20b42bf77b3d49f149f2fd683b58d714a1a2bc148820e963c77862
+  - rvm: jruby
+
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+
+script:
+  - bundle exec rake spec
+
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+
 notifications:
   slack:
     secure: Z4Wgg8oVW8i20USH3GKfNB9pFR2tmL9a/Pg42Ck/cHNmBO+3UUDcfr7O1oOCrZEYcpobB+7rhLVHt3H0cSwXNDanpsDebi0ZcNHllSK7xDVLR1r0l6QHY15kCKMVIprrDgxCn80ANCE0Yb1x2V+cvZyNJAau6jTLgRmvUZ0oD1Y=
