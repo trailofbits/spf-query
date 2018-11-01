@@ -13,5 +13,6 @@ end
 
 group :test do
   gem 'json'
+  gem 'simplecov', require: nil
   gem 'codeclimate-test-reporter', require: nil
 end
