@@ -18,20 +18,17 @@ module SPF
     # @api semipublic
     #
     def self.query(domain,resolver=Resolv::DNS.new)
-      # check for SPF in the TXT records
-      ["_spf.#{domain}", domain].each do |host|
-        begin
-          records = resolver.getresources(host, Resolv::DNS::Resource::IN::TXT)
+      begin
+        records = resolver.getresources(domain, Resolv::DNS::Resource::IN::TXT)
 
-          records.each do |record|
-            txt = record.strings.join
+        records.each do |record|
+          txt = record.strings.join
 
-            if txt.include?('v=spf1')
-              return txt
-            end
+          if txt.include?('v=spf1')
+            return txt
           end
-        rescue Resolv::ResolvError
         end
+      rescue Resolv::ResolvError
       end
 
       # check for an SPF record on the domain
