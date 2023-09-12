@@ -427,6 +427,17 @@ describe Parser do
           {macro: {letter: 'd'}}
         ]}
       end
+
+      it "should parse a macro_string with the v macro_letter" do
+        expect(subject.parse('%{ir}.%{v}.%{d}.foo.bar')).to be == {macro_string: [
+          {macro: {letter: 'i', reverse: 'r'}},
+          {literal: '.'},
+          {macro: {letter: 'v'}},
+          {literal: '.'},
+          {macro: {letter: 'd'}},
+          {literal: '.foo.bar'}
+        ]}
+      end
     end
 
     describe "macro_string?" do
