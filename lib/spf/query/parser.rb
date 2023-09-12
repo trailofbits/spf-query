@@ -151,7 +151,7 @@ module SPF
         ).as(:macro)
       end
       rule(:macro_literal) { match['\x21-\x24'] | match['\x26-\x7e'] }
-      rule(:macro_letter) { match['slodiphcrt'] }
+      rule(:macro_letter) { match['slodiphcrtv'] }
       rule(:transformers) do
         digit.repeat(1).as(:digits).maybe >> str('r').as(:reverse).maybe
       end
