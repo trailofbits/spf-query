@@ -15,7 +15,7 @@ describe SPF::Query do
       let(:domain) { 'google.com' }
 
       it "should return the first SPF record" do
-        expect(subject.query(domain)).to be == %{v=spf1 include:_netblocks.google.com include:_netblocks2.google.com include:_netblocks3.google.com ~all}
+        expect(subject.query(domain)).to be == %{v=spf1 include:_spf.google.com ~all}
       end
     end
 
@@ -41,7 +41,6 @@ describe SPF::Query do
       it "should prefer the TXT type record over other SPF records" do
         expect_any_instance_of(Resolv::DNS).to_not receive(:getresource).with("getlua.com", Resolv::DNS::Resource::IN::SPF)
         expect_any_instance_of(Resolv::DNS).to receive(:getresources).with("getlua.com", Resolv::DNS::Resource::IN::TXT).at_least(:once).and_call_original
-        expect_any_instance_of(Resolv::DNS).to receive(:getresources).with("_spf.getlua.com", Resolv::DNS::Resource::IN::TXT).at_least(:once).and_call_original
 
         expect(subject.query(domain)).to be == %{v=spf1 include:_spf.google.com include:mail.zendesk.com include:servers.mcsv.net include:aspmx.pardot.com -all}
       end
